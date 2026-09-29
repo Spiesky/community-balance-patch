@@ -55,7 +55,7 @@ stats.
 
 1. **No in-game test yet.** Install the pack, recruit a changed unit (Temple Guard, Chaos Warriors, Greatswords),
    check its card against `reports/proposals.md`, fight.
-2. **The ladder has not been reviewed.** It is about 200 judgments made in one sitting. `reports/ladder.md` shows
+2. **The ladder has not been reviewed.** It is about 200 judgments and none have been argued over yet. `reports/ladder.md` shows
    every roster in the resulting order. The biggest factors (Bloodthirster x1.7, Hell Pit Abomination x1.7, Dread
    Saurian x1.6, White Lions and Wardancers x1.5) deserve the first look.
 3. **58 units from the recent updates are unreviewed** (`tools/unreviewed.txt`: Lords of the End Times and others).
