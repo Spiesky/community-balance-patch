@@ -44,4 +44,4 @@ See [HOW_DECISIONS_ARE_MADE.md](docs/HOW_DECISIONS_ARE_MADE.md). In short:
 
 ## Status
 
-Pre-release. The first draft changes 481 units and is built for the current patch, but it has not been tested in game yet. Units added in the latest updates stay vanilla until they're reviewed.
+Pre-release. The first draft stays close to vanilla: it adjusts 334 units by at most about 20%, changes no unit sizes and leaves monsters and war machines alone for now. An earlier build loaded fine in game; this one hasn't been played yet. Units added in the latest updates stay vanilla until they're reviewed.

@@ -13,6 +13,7 @@ installed game into `vanilla_db/` (not in git, see below).
     python3 refcheck.py                # every foreign key in the pack resolves
     python3 rebalance_check.py         # every pack row matches its proposal
     python3 test_rebalance.py          # the invariants as tests; run after any change
+    python3 sense_check.py             # does the patch make sense: sizes, directions, limits, roster order, fairness
     python3 rebalance_verify.py        # equal-gold duels, vanilla vs patched
     python3 rebalance_changelog.py     # -> reports/changelog.md, the player-facing list
     python3 rebalance_ladder_view.py   # -> reports/ladder.md, every roster in ladder order
@@ -38,14 +39,20 @@ stats.
 
 ## Decisions already made
 
+- **Close to vanilla.** The patch adjusts CA's balance, it does not replace it. No unit changes size, no unit's
+  strength or price moves more than about 20% (`POWER_LIMIT`, `PRICE_LIMIT`, `RESIZE` at the top of
+  `rebalance_solve.py`). Bigger ideas (fewer, stronger Blood Knights) are community questions first.
+- **Changes make sense on their own.** A stronger unit never gets cheaper and a weaker one never dearer; a unit whose
+  stats move keeps its price. Regiments of renown move with their base unit. A final pass reverts any change that makes
+  a dearer unit weaker than a cheaper one in the same roster. `sense_check.py` checks all of it.
+- **Monsters, war beasts, chariots and war machines stay vanilla for now** (`FLAT_CASTES_MOVE`). Campaign players say
+  they are too strong, multiplayer players say many are too weak, and the model understands them least.
 - **Balance means worth its price**: every unit is judged against its own caste's price line.
 - **Lore outranks price.** A ladder entry decides; the price layer only touches units with no entry.
 - **Identity is a ray**: a change scales HP and every damage figure by one factor and moves attack and defence
   together. Charge, armour, speed, mass, shield, resistances, abilities, weapon type and splash never move.
 - **Armour ceiling**: plate 120 for any regiment of mortal knights, 125 only for demigryph riders. The solver never
   touches armour.
-- **Flat-priced castes are never made dearer.** Monsters, war beasts, chariots and war machines only ever get cheaper
-  from the price layer; the community says their weaknesses are behaviour the database does not hold.
 - **The scale is pinned** (`PINNED` in `rebalance_survey.py`): the ladder's numbers live on the 2026-09-16 fit.
   `--refit-scale` unpins, after which the ladder needs re-anchoring.
 - **Blind spots are `keep`**: where the model cannot see the cause (Wrathmongers' splash, Sky Lantern accuracy),
@@ -53,15 +60,17 @@ stats.
 
 ## Open items
 
-1. **No in-game test yet.** Install the pack, recruit a changed unit (Temple Guard, Chaos Warriors, Greatswords),
-   check its card against `reports/proposals.md`, fight.
+1. **Not played yet.** An earlier build loaded and its unit cards showed the right numbers; this build has not been
+   opened in game.
 2. **The ladder has not been reviewed.** It is about 200 judgments and none have been argued over yet. `reports/ladder.md` shows
    every roster in the resulting order. The biggest factors (Bloodthirster x1.7, Hell Pit Abomination x1.7, Dread
    Saurian x1.6, White Lions and Wardancers x1.5) deserve the first look.
 3. **58 units from the recent updates are unreviewed** (`tools/unreviewed.txt`: Lords of the End Times and others).
    They stay vanilla until they get ladder lines.
 4. **Pending decisions**, kept as vanilla until made: Centigors, the Thundertusk.
-5. **Blood Knights**: the two models disagree on 24 riders. See `units/blood_knights.md`.
+5. **Unit sizes and monsters**: the draft's bigger ideas (24 Blood Knights, 80-model guards, stronger monsters) are
+   off until the community weighs in. See `units/blood_knights.md`.
+6. **Gunpowder**: planned next (handguns, crossbows and war machines since the reload changes).
 
 ## Refreshing the game data (after a patch)
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The player-facing changelog: every change in the pack, one line per unit, faction by faction, in plain words.
 
-    python3 rebalance_changelog.py        -> ../REBALANCE_CHANGELOG.md
+    python3 rebalance_changelog.py        -> ../reports/changelog.md
 
 Reads _rebalance.json. Nothing here decides anything; it is what a workshop page or a patch note would show.
 """
@@ -50,16 +50,16 @@ def main():
     changed = [o for o in R if o["action"] != "none" and not o.get("held")]
     with open(OUT, "w") as out:
         w = out.write
-        w("# The great rebalance: what changed\n\n")
-        w("%d units across every faction. Every change keeps the unit's shape: charge, armour, speed, abilities, weapon "
-          "type and splash never move; attack, defence, HP and damage move together, and prices follow. Percentages are "
-          "against vanilla. Read `GREAT_REBALANCE.md` for why.\n\n" % len(changed))
-        w("**The headlines.** Elite guards are guards: Temple Guard, Phoenix Guard, Swordmasters and the Black Guard of "
-          "Naggarond are 80 models of Chosen quality; Sisters of Avelorn are 60. Chaos Warriors are worth three state "
-          "troops. Grail Knights are 32 and Blood Knights 24, each worth what the lore says. Greatswords, Grave Guard, "
-          "Tomb Guard, White Lions, Wardancers and Eternal Guard rise to what they are. The great beasts the lore is "
-          "unambiguous about (Bloodthirster, Dread Saurian, Hell Pit Abomination, Carnosaur, Hydra, Stonehorn) rise "
-          "without getting dearer. Chaff stays chaff and stays cheap.\n\n")
+        w("# Community Balance Patch: what changed\n\n")
+        w("%d units across every faction. This is vanilla, adjusted: no unit changes size, no unit's strength or price "
+          "moves more than about 20%%, a stronger unit never gets cheaper and a weaker one never dearer, and regiments of "
+          "renown move with their base unit. Every change keeps the unit's shape: charge, armour, speed, abilities, weapon "
+          "type and splash never move; attack, defence, HP and damage move together. Percentages are against vanilla. "
+          "See `docs/METHOD.md` for how units are measured.\n\n" % len(changed))
+        w("**The headlines.** Elite infantry and elite cavalry are worth their price: Chaos Warriors, Chosen, Greatswords, "
+          "Grave Guard, Temple Guard, Phoenix Guard, Grail Knights and Blood Knights all get a real step up over the line "
+          "troops below them. Chaff stays chaff and stays cheap. Monsters, war beasts, chariots and war machines are "
+          "unchanged for now; they are open questions for the community, as are unit sizes.\n\n")
         for fac in sorted(UM.FACTION_NAMES, key=lambda x: UM.FACTION_NAMES[x]):
             os_ = [o for o in changed if o["faction"] == fac]
             if not os_:
