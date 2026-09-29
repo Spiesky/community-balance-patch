@@ -47,6 +47,12 @@ body:
     validations:
       required: true
   - type: textarea
+    id: battle_log
+    attributes:
+      label: Battle log (optional)
+      description: If you use the Battle Logger add-on, paste the contents of cbp_battle_log.txt from your game folder here, or drag the file in. Thank you, it helps a lot.
+      render: text
+  - type: textarea
     id: notes
     attributes:
       label: Notes, replays, screenshots
