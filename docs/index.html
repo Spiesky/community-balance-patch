@@ -58,6 +58,18 @@ td.num, th.num { text-align: right; }
 .warn { color: var(--warn); }
 .hidden { display: none; }
 footer { margin-top: 22px; color: var(--muted); font-size: .92rem; text-align: center; }
+@media (min-width: 900px) {
+  main { max-width: 800px; padding-top: 5vh; }
+  .titlebar { margin: 0 -24px; }
+  .titlebar h1 { font-size: 1.35rem; padding: 0 90px; }
+}
+@media (min-width: 1700px) {
+  body { font-size: 20px; }
+  main { max-width: 900px; padding-top: 7vh; }
+  .titlebar { height: 78px; }
+  .titlebar h1 { font-size: 1.5rem; }
+  .subtitle { height: 66px; }
+}
 @media (max-width: 600px) {
   .stats { grid-template-columns: repeat(2, 1fr); } table { font-size: .88rem; } th, td { padding: 5px 5px; }
 }
