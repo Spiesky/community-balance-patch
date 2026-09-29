@@ -31,7 +31,7 @@ import unit_model as UM
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PACK = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(HERE), "build", "community_balance_patch.pack")
-PROPOSALS = os.path.join(HERE, "_rebalance.json")
+PROPOSALS = os.environ.get("CBP_PROPOSALS") or os.path.join(HERE, "_rebalance.json")
 DRIFT_MAX = 0.02
 PREFIX = "gr_"
 

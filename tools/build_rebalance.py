@@ -34,7 +34,7 @@ from decided import STATS, coerce
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.environ.get("CBP_OUT", os.path.join(os.path.dirname(HERE), "build", "community_balance_patch.pack"))
-PROPOSALS = os.path.join(HERE, "_rebalance.json")
+PROPOSALS = os.environ.get("CBP_PROPOSALS") or os.path.join(HERE, "_rebalance.json")
 PREFIX = "gr_"                     # the great rebalance's own keys
 
 

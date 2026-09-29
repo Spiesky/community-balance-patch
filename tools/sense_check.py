@@ -11,7 +11,7 @@
 import json, math, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-R = json.load(open(os.path.join(HERE, "_rebalance.json")))["units"]
+R = json.load(open(os.environ.get("CBP_PROPOSALS") or os.path.join(HERE, "_rebalance.json")))["units"]
 fails = []
 
 

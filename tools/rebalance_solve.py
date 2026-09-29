@@ -46,6 +46,7 @@ ROOT = os.path.dirname(HERE)
 SURVEY = os.path.join(HERE, "_survey.json")
 OUT_MD = os.path.join(ROOT, "reports", "proposals.md")
 OUT_JSON = os.path.join(HERE, "_rebalance.json")
+BETA_JSON = os.path.join(HERE, "_beta.json")   # what the beta ships: the lore elites and the gunpowder rule only
 
 # Close to vanilla: the patch adjusts CA's balance so it makes more sense, it does not replace it.
 RESIZE = False              # unit sizes stay vanilla (the ladder's sizes are community questions, e.g. units/blood_knights.md)
@@ -594,6 +595,15 @@ def main():
             for o in sorted(ps, key=lambda o: (o["action"] == "none", o["caste"], -o["power_reg"])):
                 w(row(o))
     json.dump(dict(weights=S["weights"], tolerance=TOLERANCE, cap=CAP, units=props), open(OUT_JSON, "w"), indent=1)
+    # the beta: every proposal is published, but only the design rules go into the pack; the rest waits for players
+    import copy
+    beta = copy.deepcopy(props)
+    for o in beta:
+        o.pop("gun", None)
+        if not o.get("elite"):
+            vanilla_prop(o, "proposal only (not in the beta): " + o["note"] if o["action"] != "none" else o["note"])
+    print("beta: gunpowder rule applied:", apply_gunpowder(beta), "| elites:", sum(1 for o in beta if o.get("elite")))
+    json.dump(dict(weights=S["weights"], tolerance=TOLERANCE, cap=CAP, units=beta), open(BETA_JSON, "w"), indent=1)
     print("proposals:", {k: len(v) for k, v in by_action.items()})
     print("wrote", OUT_MD, "and", OUT_JSON)
 
