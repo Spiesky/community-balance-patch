@@ -29,7 +29,7 @@ Four kinds of entry that the cavalry study did not need:
     hold_price=True  the stats move to the target, the price stays at vanilla (the community says it is dear already).
     price_add=-25    the stats are the lore, the price moves by a fixed amount (the community's number, where the
                      model is blind: Kislev's hybrids).
-An entry here outranks the cavalry study's table for the same key (COMMUNITY_BALANCE.md: Centigors).
+An entry here outranks the cavalry study's table for the same key (docs/COMMUNITY_RESEARCH.md: Centigors).
 
 Tabletop profiles quoted in the notes are from memory of the 6th-8th edition army books and are approximate.
 """
@@ -203,7 +203,7 @@ LADDER = [
     L(r"ogr_inf_eshin_maneater", None, "champion", note="The Eshin Maneater: one ogre assassin; the stats are the lore, the price moves to what they are worth."),
     # ---------------------------------------------------------------------------------------------------- Daemons of Chaos
     L(r"dae_inf_chaos_furies", keep=True, note="Furies: vanilla."),
-    # ------------------------------------------------------- the model's blind spots (COMMUNITY_BALANCE.md section 3)
+    # ------------------------------------------------------- the model's blind spots (docs/COMMUNITY_RESEARCH.md section 3)
     L(r"chd_cav_bull_centaurs_dual_axe_ror", keep=True, note="Hashut's Dark Ravagers: a regiment of renown with a blunderbuss the model counts at full; kept rather than held."),
     L(r"emp_cav_outriders_morr", keep=True, note="Amethyst Outriders: the model rates them far above their price (110 armour on outriders); nobody else does. Kept rather than held."),
     L(r"ogr_mon_thundertusk", keep=True, note="Thundertusk: the model calls it over-priced, the multiplayer list calls it over-performing; kept until the community decides."),

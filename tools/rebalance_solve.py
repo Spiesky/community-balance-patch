@@ -2,7 +2,7 @@
 """The solver: turn the survey's residuals and the lore targets into stat and price proposals that keep every unit's
 identity.
 
-    python3 rebalance_solve.py            -> ../REBALANCE_DATA.md and _rebalance.json (what build_rebalance.py writes)
+    python3 rebalance_solve.py            -> ../reports/proposals.md and _rebalance.json (what build_rebalance.py writes)
 
 Three layers, in order of authority:
 
@@ -46,10 +46,17 @@ SURVEY = os.path.join(HERE, "_survey.json")
 OUT_MD = os.path.join(ROOT, "reports", "proposals.md")
 OUT_JSON = os.path.join(HERE, "_rebalance.json")
 
+# Close to vanilla: the patch adjusts CA's balance so it makes more sense, it does not replace it.
+RESIZE = False              # unit sizes stay vanilla (the ladder's sizes are community questions, e.g. units/blood_knights.md)
+POWER_LIMIT = math.log(1.20)   # the most any unit's regiment power moves, up or down
+PRICE_LIMIT = math.log(1.20)   # the most any price moves, up or down
+FLAT_CASTES_MOVE = False    # monsters, war beasts, chariots, war machines stay vanilla: the campaign says they are too strong,
+                            # multiplayer says many are too weak, and the model understands them least
+
 TOLERANCE = 0.15            # |residual| inside this band (one robust sigma): the unit is fine, nothing moves
-CAP = math.log(1.25)        # the most a unit's regiment power moves in one pass (x1.25 or /1.25); the rest goes to price
-PRICE_CAP = math.log(1.25)  # the most a price moves in one pass; what is left over is reported as unresolved
-LORE_PRICE_CAP = math.log(1.6)   # a lore unit's price goes to what the valuation says it is worth, within this of vanilla
+CAP = POWER_LIMIT           # the most a unit's regiment power moves through the price layer
+PRICE_CAP = PRICE_LIMIT     # the most a price moves
+LORE_PRICE_CAP = PRICE_LIMIT   # a lore unit's price goes to what the valuation says it is worth, within this of vanilla
 # units added to the game after the ladder was written (update 25507028, 2026-09-24): kept as vanilla until reviewed
 UNREVIEWED = {l.split()[0] for l in open(os.path.join(HERE, "unreviewed.txt")) if l.strip() and not l.startswith("#")}
 VETO = set()                # units whose stats must not move whatever the residual says (price may): add keys here
@@ -92,8 +99,9 @@ def scaled(c, k):
             m[d] = c["missile"][d] * k
         v["missile"] = m
     d = K_ATTACK * math.log(k)
-    v["ma"] = min(MA_BOUNDS[1], max(MA_BOUNDS[0], c["ma"] + d))
-    v["md"] = min(MD_BOUNDS[1], max(MD_BOUNDS[0], c["md"] + d))
+    # the bounds may stop a change, never reverse it (a vanilla 95 attack is not cut to 80 by a rise)
+    v["ma"] = c["ma"] + d if (MA_BOUNDS[0] <= c["ma"] + d <= MA_BOUNDS[1]) else (max(c["ma"], MA_BOUNDS[1]) if d > 0 else min(c["ma"], MA_BOUNDS[0]))
+    v["md"] = c["md"] + d if (MD_BOUNDS[0] <= c["md"] + d <= MD_BOUNDS[1]) else (max(c["md"], MD_BOUNDS[1]) if d > 0 else min(c["md"], MD_BOUNDS[0]))
     return v
 
 
@@ -222,15 +230,21 @@ def propose(key):
                    new_cost=new_cost, new_campaign_cost=(x["campaign_cost"] + L["price_add"] if x["campaign_cost"] else x["campaign_cost"]),
                    new_upkeep=int(round(x["upkeep"] * new_cost / x["cost"])) if x["cost"] else x["upkeep"])
         return out
+    if x["caste"] in PRICE_CASTES and not FLAT_CASTES_MOVE:
+        out["after"] = snapshot(c); out["after"]["power_reg"] = x["power_reg"]
+        out.update(new_cost=x["cost"], new_campaign_cost=x["campaign_cost"], new_upkeep=x["upkeep"], k=1.0, drift=0.0, lore=bool(L),
+                   note="%s: kept as vanilla (monsters, beasts, chariots and machines are community questions)" % x["caste"].replace("_", " "))
+        return out
     if L:
         v = dict(c)
-        if L["size"]:
+        if L["size"] and RESIZE:
             v["men"] = L["size"]
         if L["price_only"]:
             v, k, p1 = c, 1.0, x["power_reg"]
         else:
             per_model_now = UM.regiment_power(c) / c["men"]
-            v, k = solve(v, per_model_now * L["factor"] * v["men"])
+            factor = L["factor"] if RESIZE else max(math.exp(-POWER_LIMIT), min(math.exp(POWER_LIMIT), L["factor"]))
+            v, k = solve(v, per_model_now * factor * v["men"])
             v = rounded(v, c)
             p1 = UM.regiment_power(v)
         move = math.log(p1 / x["power_reg"])
@@ -249,9 +263,11 @@ def propose(key):
         elif x["caste"] in STAT_CASTES:
             want = fair_log_cost(xx, p1) - math.log(max(1.0, x["cost"])) if x["cost"] else 0.0
             price_move = max(-LORE_PRICE_CAP, min(LORE_PRICE_CAP, want))
+            if not L["price_only"]:                    # a stronger unit never gets cheaper, a weaker one never dearer
+                price_move = max(0.0, price_move) if move >= 0 else min(0.0, price_move)
         else:
             # flat-priced castes: the price follows the power along the caste's line and the residual is corrected
-            # up to the cap, as before, but the result is never above vanilla (COMMUNITY_BALANCE.md): a Bloodthirster
+            # up to the cap, as before, but the result is never above vanilla (docs/COMMUNITY_RESEARCH.md): a Bloodthirster
             # x1.7 stronger that was over-priced ends near its old price, a stronger Great Eagle stays at 750
             price_move = min(0.0, slope * move + max(-PRICE_CAP, min(PRICE_CAP, -res)))
         new_cost = price_round(x["cost"] * math.exp(price_move)) if x["cost"] else x["cost"]
@@ -278,12 +294,14 @@ def propose(key):
         move = 0.0
     left = res - slope * move                            # what the stats do not absorb goes to the price
     price_move = max(-PRICE_CAP, min(PRICE_CAP, -left))
+    if move:                                             # one lever: a unit whose stats move keeps its price
+        price_move = 0.0
     if x["caste"] in PRICE_CASTES and res < 0:
         # a "bargain" in a flat-priced caste is the model over-rating a unit whose weakness is behaviour it cannot
         # see (accuracy, mobility, breath in melee, crumbling); the price is never raised there
         out["after"] = snapshot(c); out["after"]["power_reg"] = x["power_reg"]
         out.update(new_cost=x["cost"], new_campaign_cost=x["campaign_cost"], new_upkeep=x["upkeep"], k=1.0, drift=0.0,
-                   note="residual %+.2f in a flat-priced caste: not raised (the model's blind spot, COMMUNITY_BALANCE.md)" % res)
+                   note="residual %+.2f in a flat-priced caste: not raised (the model's blind spot, docs/COMMUNITY_RESEARCH.md)" % res)
         return out
     unresolved = -left - price_move
     v, k = (solve(c, x["power_reg"] * math.exp(move)) if move else (c, 1.0))
@@ -360,9 +378,120 @@ def row(o):
         delta(o["cost"], o["new_cost"], "%d"), delta(o["campaign_cost"], o["new_campaign_cost"], "%d"), o.get("drift", 0.0), o["note"])
 
 
+def vanilla_prop(o, note):
+    """back to vanilla, keeping the record of why"""
+    x = ROWS[o["key"]]
+    c = UM.card(o["key"])
+    o.update(action="none", note=note, after=snapshot(c), k=1.0, drift=0.0, new_cost=x["cost"],
+             new_campaign_cost=x["campaign_cost"], new_upkeep=x["upkeep"])
+    o["after"]["power_reg"] = x["power_reg"]
+    o.pop("held", None)
+
+
+def base_of(o, by_name):
+    """a regiment of renown's base unit: 'Black-Horn's Ravagers (Gor Herd – Shields)' -> 'Gor Herd (Shields)'"""
+    m = re.match(r"^(.*) \((.+)\)$", o["name"])
+    if not m:
+        return None
+    inner = m.group(2)
+    for name in (inner, re.sub(r" – (.+)$", r" (\1)", inner)):
+        for b in by_name.get(name, []):
+            if b["faction"] == o["faction"] and b["caste"] == o["caste"] and b is not o:
+                return b
+    return None
+
+
+def follow_bases(props):
+    """a regiment of renown moves with its base unit: the same power ratio and the same price ratio, so CA's premium for
+    the renown stays as it was. If the base did not change, neither does the regiment."""
+    by_name = {}
+    for o in props:
+        by_name.setdefault(o["name"], []).append(o)
+    n = 0
+    for o in props:
+        if o["action"] == "decided" or o["key"] in UNREVIEWED:
+            continue
+        b = base_of(o, by_name)
+        if not b or b is o or base_of(b, by_name):
+            continue
+        n += 1
+        x = ROWS[o["key"]]
+        if b["action"] == "none":
+            vanilla_prop(o, "regiment of renown: follows %s, which is unchanged" % b["name"])
+            continue
+        ratio = b["after"]["power_reg"] / b["power_reg"]
+        price_ratio = (b["new_cost"] / b["cost"]) if b["cost"] else 1.0
+        c = UM.card(o["key"])
+        v, k = solve(c, x["power_reg"] * ratio) if abs(math.log(ratio)) > 0.005 else (c, 1.0)
+        v = rounded(v, c) if k != 1.0 else c
+        new_cost = price_round(x["cost"] * price_ratio) if x["cost"] else x["cost"]
+        o.update(action="lore" if b["action"] == "lore" else ("stats" if k != 1.0 else "price"), after=snapshot(v), k=k,
+                 drift=UM.identity_drift(c, v) if k != 1.0 else 0.0, new_cost=new_cost,
+                 new_campaign_cost=(price_round(x["campaign_cost"] * new_cost / x["cost"]) if x["campaign_cost"] and x["cost"] else x["campaign_cost"]),
+                 new_upkeep=int(round(x["upkeep"] * new_cost / x["cost"])) if x["cost"] else x["upkeep"],
+                 note="regiment of renown: follows %s (power x%.2f, price x%.2f)" % (b["name"], ratio, price_ratio))
+        o["after"]["power_reg"] = UM.regiment_power(v) if k != 1.0 else x["power_reg"]
+        o.pop("held", None)
+        if o["drift"] > 0.03:                           # the same factor would change how this regiment fights
+            vanilla_prop(o, "regiment of renown: kept as vanilla, scaling it with %s would change how it fights" % b["name"])
+    return n
+
+
+def inversions(props, after):
+    """pairs in one faction and caste where the dearer unit is more than 15% weaker (regiments of renown left out)"""
+    groups = {}
+    for o in props:
+        cost = o["new_cost"] if after else o["cost"]
+        if cost and not base_of_cache.get(o["key"]):
+            groups.setdefault((o["faction"], o["caste"]), []).append(o)
+    out = set()
+    for grp in groups.values():
+        for i, a in enumerate(grp):
+            for b in grp[i + 1:]:
+                ca, cb = (a["new_cost"], b["new_cost"]) if after else (a["cost"], b["cost"])
+                pa, pb = (a["after"]["power_reg"], b["after"]["power_reg"]) if after else (a["power_reg"], b["power_reg"])
+                if abs(ca - cb) < 50:
+                    continue
+                if (ca > cb and pb > pa * 1.15) or (cb > ca and pa > pb * 1.15):
+                    out.add((a["key"], b["key"]))
+    return out
+
+
+base_of_cache = {}
+
+
+def guard(props):
+    """revert, one at a time, the change behind every 'pay more, get less' pair the patch creates that vanilla did not have"""
+    by_key = {o["key"]: o for o in props}
+    before = inversions(props, False)
+    reverted = []
+    while True:
+        new = [pair for pair in inversions(props, True) if pair not in before]
+        if not new:
+            return reverted
+        blame = {}
+        for a, b in new:
+            for k in (a, b):
+                o = by_key[k]
+                if o["action"] not in ("none", "decided"):
+                    blame[k] = blame.get(k, 0) + 1
+        if not blame:
+            return reverted
+        worst = max(blame, key=lambda k: (blame[k], abs(math.log(by_key[k]["after"]["power_reg"] / by_key[k]["power_reg"]))))
+        vanilla_prop(by_key[worst], "reverted: this change made a dearer unit weaker than a cheaper one in the same roster")
+        reverted.append(by_key[worst]["name"])
+
+
 def main():
     keys = [k for k in UM.recruitable() if k in ROWS]
     props = [propose(k) for k in keys]
+    by_name = {}
+    for o in props:
+        by_name.setdefault(o["name"], []).append(o)
+    base_of_cache.update({o["key"]: base_of(o, by_name) for o in props})
+    print("regiments of renown following their base:", follow_bases(props))
+    reverted = guard(props)
+    print("reverted by the pay-more-get-less guard: %d %s" % (len(reverted), reverted[:12]))
     by_action = {}
     for o in props:
         by_action.setdefault(o["action"], []).append(o)
@@ -371,9 +500,9 @@ def main():
     drift = [o["drift"] for o in changed if o.get("drift") is not None]
     with open(OUT_MD, "w") as out:
         w = out.write
-        w("# The great rebalance: every proposal\n\n")
+        w("# Community Balance Patch: every change\n\n")
         w("Generated by `tools/rebalance_solve.py` from `_survey.json` (`rebalance_survey.py`) and the cavalry study. "
-          "Read `GREAT_REBALANCE.md` for the method and `REBALANCE_SURVEY.md` for the measurements.\n\n")
+          "See `docs/METHOD.md` for the method and `reports/survey.md` for the measurements.\n\n")
         w("| | units |\n|---|---|\n")
         for k in ("none", "decided", "lore", "stats", "stats+price", "price"):
             w("| %s | %d |\n" % (k, len(by_action.get(k, []))))
