@@ -82,14 +82,29 @@ local function write_battle()
 end
 
 local written = false
+-- a failure is never allowed to touch the battle, but it is written down instead of swallowed, so it can be fixed
+local function note(text)
+	local file = io.open(LOG_FILE, "a")
+	if file then
+		file:write(text .. "\n")
+		file:close()
+	end
+end
+
 local function on_complete()
 	if written then
 		return
 	end
 	written = true
-	safe(write_battle)
+	local ok, err = pcall(write_battle)
+	if not ok then
+		pcall(note, "#error;v" .. VERSION .. ";write_battle;" .. tostring(err))
+	end
 end
 
-safe(function()
+local ok, err = pcall(function()
 	bm:register_phase_change_callback("Complete", on_complete)
 end)
+if not ok then
+	pcall(note, "#error;v" .. VERSION .. ";register;" .. tostring(err))
+end
