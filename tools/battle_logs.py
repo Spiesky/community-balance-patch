@@ -24,11 +24,11 @@ def read(paths):
             elif line.startswith("u;") and battle is not None:
                 f = line.split(";")
                 if len(f) >= 10:
-                    battle["units"].append(dict(key=f[4], men=f[5], alive=f[6], kills=f[7], routing=f[8]))
+                    battle["units"].append(dict(key=f[4], men=f[5], alive=f[6], kills=f[7], routing=f[8], player=f[3]))
             elif line.startswith("a;") and battle is not None:
                 f = line.split(";")                 # auto-resolve: strength in percent before and after
                 if len(f) >= 6:
-                    battle["units"].append(dict(key=f[3], men=f[4], alive=f[5], kills="0", routing="0"))
+                    battle["units"].append(dict(key=f[3], men=f[4], alive=f[5], kills="0", routing="0", player=f[2]))
             elif line == "#end" and battle is not None:
                 yield battle
                 battle = None
