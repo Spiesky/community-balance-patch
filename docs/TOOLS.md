@@ -21,6 +21,9 @@ installed game into `vanilla_db/` (not in git, see below).
     python3 rebalance_ladder_view.py   # -> reports/ladder.md, every roster in ladder order
     python3 cavalry_rebalance.py       # -> reports/cavalry_study.md
 
+Battle logs from the Battle Logger add-on: `python3 battle_logs.py log1.txt log2.txt` sums them up per unit, patched and
+vanilla separately (`--unit blood_knights` to filter).
+
 One unit end to end: `python3 rebalance_explain.py "Temple Guard"`. What an edit changed: copy `_rebalance.json`
 first, re-run, then `python3 rebalance_diff.py before.json _rebalance.json`. `python3 build_rebalance.py <unit key> ...`
 builds a pack with only those units, for testing one change at a time.
