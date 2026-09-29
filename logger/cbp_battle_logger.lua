@@ -3,12 +3,13 @@
 -- At the end of every battle this writes one line per unit to cbp_battle_log.txt in the game folder: the unit, how
 -- many models it started and ended with, how many it killed, and whether it was routing. It also notes the names of the
 -- mod packs in use (names only, never folder paths). Nothing leaves your PC: the game's scripts cannot go online. If you
--- want to help, attach the file to a test report on the Community Balance Patch GitHub page. Thank you!
+-- want to help, share it at https://spiesky.github.io/community-balance-patch/ . Thank you!
 --
 -- It only reads. Everything is wrapped so that a failure here can never affect the battle.
 
 local LOG_FILE = "cbp_battle_log.txt"
 local VERSION = "1"
+local SHARE_PAGE = "https://spiesky.github.io/community-balance-patch/"
 
 local function safe(f, ...)
 	local ok, result = pcall(f, ...)
@@ -67,6 +68,12 @@ local function write_battle()
 		end
 	end
 	table.insert(lines, "#end")
+	local existing = io.open(LOG_FILE, "r")
+	if existing then
+		existing:close()
+	else
+		table.insert(lines, 1, "# Community Balance Patch Battle Logger. Share this file at " .. SHARE_PAGE .. " - thank you!")
+	end
 	local file = io.open(LOG_FILE, "a")
 	if file then
 		file:write(table.concat(lines, "\n") .. "\n")

@@ -12,6 +12,7 @@ The community is not always right, and neither is the model. A change goes in wh
 
 - **Suggest a change:** [open a suggestion](../../issues/new?template=suggestion.yml). One unit (or one unit family) per suggestion.
 - **Report a test:** [post a test result](../../issues/new?template=test_report.yml). Tell us what you fought, at what settings, and what happened. Replays and screenshots are gold.
+- **Share a battle log:** run the optional Battle Logger add-on, then drop your `cbp_battle_log.txt` on [the upload page](https://spiesky.github.io/community-balance-patch/). Thank you, it helps a lot.
 - **Argue about it:** use [Discussions](../../discussions) for the big questions ("what should Blood Knights be?").
 
 ## How changes are decided
