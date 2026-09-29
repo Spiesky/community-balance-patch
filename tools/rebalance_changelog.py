@@ -11,7 +11,7 @@ import os
 import unit_model as UM
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(os.path.dirname(HERE), "reports", "changelog.md")
+OUT = os.environ.get("CBP_CHANGELOG") or os.path.join(os.path.dirname(HERE), "reports", "changelog.md")
 
 
 def pct(a, b):
@@ -50,10 +50,28 @@ def line(o):
 
 
 def main():
-    R = json.load(open(os.path.join(HERE, "_rebalance.json")))["units"]
+    R = json.load(open(os.environ.get("CBP_PROPOSALS") or os.path.join(HERE, "_rebalance.json")))["units"]
     changed = [o for o in R if o["action"] != "none" and not o.get("held")]
     with open(OUT, "w") as out:
         w = out.write
+        if os.environ.get("CBP_BETA") == "1":
+            w("# Community Balance Patch beta: what's in the pack\n\n")
+            w("%d units. The beta ships only two changes; everything else is a proposal (see `reports/changelog.md`) "
+              "waiting for players to test and argue about.\n\n"
+              "**Lore elites are fewer and far stronger.** Blood Knights, Grail Knights, Grail Guardians and the Swords of "
+              "Chaos. A unit made smaller never has less total health than vanilla, and its price never rises faster than "
+              "its strength.\n\n"
+              "**Gunpowder hits hard and reloads slow.** Handguns, rifles, jezzails, blunderbusses and pistols fire a 60%% "
+              "heavier volley and take 50%% longer to reload. Damage over time barely changes; how you use them does.\n\n" % len(changed))
+            for fac in sorted(UM.FACTION_NAMES, key=lambda x: UM.FACTION_NAMES[x]):
+                os_ = [o for o in changed if o["faction"] == fac]
+                if os_:
+                    w("## %s (%d)\n\n" % (UM.FACTION_NAMES[fac], len(os_)))
+                    for o in sorted(os_, key=lambda o: o["name"]):
+                        w(line(o) + "\n")
+                    w("\n")
+            print("wrote", OUT, "units:", len(changed))
+            return
         w("# Community Balance Patch: what changed\n\n")
         w("%d units across every faction. This is vanilla, adjusted: apart from the lore elites below no unit changes size, "
           "no unit's strength or price moves more than about 20%%, a stronger unit never gets cheaper and a weaker one never dearer, and regiments of "
