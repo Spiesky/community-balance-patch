@@ -135,12 +135,14 @@ def main():
                     counts["weapons"] += 1
                 lu["primary_melee_weapon"] = w["key"]
                 touched = True
-            if abs(k - 1.0) > 1e-9 and d["missile"] and lu.get("primary_missile_weapon"):
+            gun_d, gun_r = o.get("gun") or (1.0, 1.0)     # gunpowder.py: heavier volley, slower reload
+            if (abs(k - 1.0) > 1e-9 or o.get("gun")) and d["missile"] and lu.get("primary_missile_weapon"):
                 vmw = MIS[lu["primary_missile_weapon"]]
                 p = dict(PJ[vmw["default_projectile"]])
                 p["key"] = PREFIX + lukey
                 for col in ("damage", "ap_damage", "bonus_v_large", "bonus_v_infantry"):
-                    p[col] = str(int(round(float(p[col] or 0) * k)))
+                    p[col] = str(int(round(float(p[col] or 0) * k * gun_d)))
+                p["base_reload_time"] = str(round(float(p["base_reload_time"]) * gun_r, 2))
                 mw = dict(vmw)
                 mw["key"], mw["default_projectile"] = PREFIX + lukey, p["key"]
                 if first_for_land:
@@ -158,7 +160,8 @@ def main():
                     ap_ = dict(PJ[amw["default_projectile"]])
                     ap_["key"] = "%s%s_alt%d" % (PREFIX, key, i)
                     for col in ("damage", "ap_damage", "bonus_v_large", "bonus_v_infantry"):
-                        ap_[col] = str(int(round(float(ap_[col] or 0) * k)))
+                        ap_[col] = str(int(round(float(ap_[col] or 0) * k * gun_d)))
+                    ap_["base_reload_time"] = str(round(float(ap_["base_reload_time"]) * gun_r, 2))
                     projectiles.append(coerce("projectiles", ap_))
                     amw["key"], amw["default_projectile"] = ap_["key"], ap_["key"]
                     missiles.append(coerce("missile_weapons", amw))

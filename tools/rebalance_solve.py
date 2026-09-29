@@ -39,6 +39,7 @@ import cavalry_model as CM
 import cavalry_rebalance as CR
 import lore_ladder as LL
 import decided
+import gunpowder as GP
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -52,6 +53,12 @@ POWER_LIMIT = math.log(1.20)   # the most any unit's regiment power moves, up or
 PRICE_LIMIT = math.log(1.20)   # the most any price moves, up or down
 FLAT_CASTES_MOVE = False    # monsters, war beasts, chariots, war machines stay vanilla: the campaign says they are too strong,
                             # multiplayer says many are too weak, and the model understands them least
+
+# The exception: the lore's elite cavalry are fewer and far stronger than vanilla makes them. They take the lore's size
+# and strength in full, never end up with less total health than vanilla, and their price follows their power (within
+# ELITE_PRICE_CAP). Everything else stays close to vanilla.
+ELITE = re.compile(r"vmp_blood_knights|vmp_cav_blood_knights|brt_cav_grail_knights|brt_cav_grail_guardians|chs_cav_chaos_knights_ror_0")
+ELITE_PRICE_CAP = math.log(1.6)
 
 TOLERANCE = 0.15            # |residual| inside this band (one robust sigma): the unit is fine, nothing moves
 CAP = POWER_LIMIT           # the most a unit's regiment power moves through the price layer
@@ -235,16 +242,22 @@ def propose(key):
         out.update(new_cost=x["cost"], new_campaign_cost=x["campaign_cost"], new_upkeep=x["upkeep"], k=1.0, drift=0.0, lore=bool(L),
                    note="%s: kept as vanilla (monsters, beasts, chariots and machines are community questions)" % x["caste"].replace("_", " "))
         return out
+    elite = bool(L) and bool(ELITE.search(key)) and not L["keep"]
     if L:
         v = dict(c)
-        if L["size"] and RESIZE:
+        if L["size"] and (RESIZE or elite):
             v["men"] = L["size"]
         if L["price_only"]:
             v, k, p1 = c, 1.0, x["power_reg"]
         else:
             per_model_now = UM.regiment_power(c) / c["men"]
-            factor = L["factor"] if RESIZE else max(math.exp(-POWER_LIMIT), min(math.exp(POWER_LIMIT), L["factor"]))
+            factor = L["factor"] if (RESIZE or elite) else max(math.exp(-POWER_LIMIT), min(math.exp(POWER_LIMIT), L["factor"]))
             v, k = solve(v, per_model_now * factor * v["men"])
+            if v["men"] < c["men"] and k < c["men"] / v["men"]:
+                # fewer models never means less health: at least the vanilla regiment's total
+                base = dict(c, men=v["men"])
+                k = c["men"] / v["men"]
+                v = scaled(base, k)
             v = rounded(v, c)
             p1 = UM.regiment_power(v)
         move = math.log(p1 / x["power_reg"])
@@ -262,9 +275,12 @@ def propose(key):
             price_move = 0.0
         elif x["caste"] in STAT_CASTES:
             want = fair_log_cost(xx, p1) - math.log(max(1.0, x["cost"])) if x["cost"] else 0.0
-            price_move = max(-LORE_PRICE_CAP, min(LORE_PRICE_CAP, want))
+            cap = ELITE_PRICE_CAP if elite else LORE_PRICE_CAP
+            price_move = max(-cap, min(cap, want))
             if not L["price_only"]:                    # a stronger unit never gets cheaper, a weaker one never dearer
                 price_move = max(0.0, price_move) if move >= 0 else min(0.0, price_move)
+            if elite and move > 0:                     # the price never rises faster than the power
+                price_move = min(price_move, move)
         else:
             # flat-priced castes: the price follows the power along the caste's line and the residual is corrected
             # up to the cap, as before, but the result is never above vanilla (docs/COMMUNITY_RESEARCH.md): a Bloodthirster
@@ -274,7 +290,7 @@ def propose(key):
         how = ("the stats are the lore; the price moves to what they are worth" if L["price_only"]
                else "target %.2f per model on %s (vanilla %.2f, x%.2f)" % (L["target"], L["source"], L["now"], L["factor"]))
         out.update(action="lore", note="%s: %s. %s" % (L["tier"], how, L["note"]), after=snapshot(v), k=k,
-                   drift=UM.identity_drift(c, v) if k != 1.0 else 0.0, lore=True)
+                   drift=UM.identity_drift(c, v) if k != 1.0 else 0.0, lore=True, elite=elite)
         out["after"]["power_reg"] = p1
         out.update(new_cost=new_cost, new_campaign_cost=(price_round(x["campaign_cost"] * new_cost / x["cost"]) if x["campaign_cost"] and x["cost"] else x["campaign_cost"]),
                    new_upkeep=int(round(x["upkeep"] * new_cost / x["cost"])) if x["cost"] else x["upkeep"])
@@ -409,7 +425,7 @@ def follow_bases(props):
         by_name.setdefault(o["name"], []).append(o)
     n = 0
     for o in props:
-        if o["action"] == "decided" or o["key"] in UNREVIEWED:
+        if o["action"] == "decided" or o["key"] in UNREVIEWED or o.get("elite"):
             continue
         b = base_of(o, by_name)
         if not b or b is o or base_of(b, by_name):
@@ -473,13 +489,52 @@ def guard(props):
         for a, b in new:
             for k in (a, b):
                 o = by_key[k]
-                if o["action"] not in ("none", "decided"):
+                if o["action"] not in ("none", "decided", "gunpowder") and not o.get("elite") and not o.get("gun"):
                     blame[k] = blame.get(k, 0) + 1
         if not blame:
             return reverted
         worst = max(blame, key=lambda k: (blame[k], abs(math.log(by_key[k]["after"]["power_reg"] / by_key[k]["power_reg"]))))
         vanilla_prop(by_key[worst], "reverted: this change made a dearer unit weaker than a cheaper one in the same roster")
         reverted.append(by_key[worst]["name"])
+
+
+def apply_gunpowder(props):
+    """the gunpowder rule (gunpowder.py) on top of whatever else the unit got: a heavier volley, a slower reload. It is a
+    design rule, not a balance correction, so the price stays where the rest of the solver put it."""
+    n = 0
+    for o in props:
+        if o["key"] in UNREVIEWED or o["action"] == "decided":
+            continue
+        c = UM.card(o["key"])
+        if not GP.applies(c, o["caste"]):
+            continue
+        a = o["after"]
+        v = dict(c, men=a["men"], ma=a["ma"], md=a["md"], hp=a["hp"], base=a["base"], ap=a["ap"], bvl=a["bvl"], bvi=a["bvi"])
+        if a.get("missile"):
+            v["missile"] = dict(c["missile"], **{d: a["missile"][d] for d in ("base", "ap", "bvl", "bvi")})
+        v = GP.apply(v)
+        o["gun"] = [GP.DAMAGE, GP.RELOAD]
+        o["after"]["missile"] = dict(a["missile"], **{d: v["missile"][d] for d in ("base", "ap", "bvl", "bvi")}, reload=v["missile"]["reload"])
+        before_gun = o["after"]["power_reg"]
+        o["after"]["power_reg"] = UM.regiment_power(v)
+        # the price follows what the rule adds (never below vanilla: a stronger unit does not get cheaper)
+        x = ROWS[o["key"]]
+        if x["cost"]:
+            # the whole change against vanilla decides the price, in the same direction and within the limit
+            total = o["after"]["power_reg"] / o["power_reg"]
+            want = price_round(o["new_cost"] * o["after"]["power_reg"] / before_gun)
+            lo, hi = (x["cost"], x["cost"] * math.exp(PRICE_LIMIT)) if total >= 1 else (x["cost"] * math.exp(-PRICE_LIMIT), x["cost"])
+            o["new_cost"] = int(min(hi, max(lo, want)))
+            o["new_cost"] = price_round(o["new_cost"]) if lo <= price_round(o["new_cost"]) <= hi else o["new_cost"]
+            o["new_campaign_cost"] = price_round(x["campaign_cost"] * o["new_cost"] / x["cost"]) if x["campaign_cost"] else x["campaign_cost"]
+            o["new_upkeep"] = int(round(x["upkeep"] * o["new_cost"] / x["cost"]))
+        if o["action"] == "none":
+            o["action"] = "gunpowder"
+            o["note"] = "gunpowder: volley x%.2f, reload x%.2f. %s" % (GP.DAMAGE, GP.RELOAD, o["note"])
+        else:
+            o["note"] += "; gunpowder: volley x%.2f, reload x%.2f" % (GP.DAMAGE, GP.RELOAD)
+        n += 1
+    return n
 
 
 def main():
@@ -492,6 +547,9 @@ def main():
     print("regiments of renown following their base:", follow_bases(props))
     reverted = guard(props)
     print("reverted by the pay-more-get-less guard: %d %s" % (len(reverted), reverted[:12]))
+    print("gunpowder rule applied:", apply_gunpowder(props))
+    reverted = guard(props)
+    print("reverted after the gunpowder rule: %d %s" % (len(reverted), reverted[:12]))
     by_action = {}
     for o in props:
         by_action.setdefault(o["action"], []).append(o)
@@ -504,7 +562,7 @@ def main():
         w("Generated by `tools/rebalance_solve.py` from `_survey.json` (`rebalance_survey.py`) and the cavalry study. "
           "See `docs/METHOD.md` for the method and `reports/survey.md` for the measurements.\n\n")
         w("| | units |\n|---|---|\n")
-        for k in ("none", "decided", "lore", "stats", "stats+price", "price"):
+        for k in ("none", "decided", "lore", "stats", "stats+price", "price", "gunpowder"):
             w("| %s | %d |\n" % (k, len(by_action.get(k, []))))
         w("| lore: as vanilla (kept on purpose) | %d |\n" % sum(1 for o in props if o["action"] == "none" and o.get("lore")))
         w("| **changed** | **%d** of %d |\n" % (len(changed), len(props)))

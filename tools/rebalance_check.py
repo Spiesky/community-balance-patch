@@ -169,7 +169,8 @@ def main():
                 p = projectiles.get(mw["default_projectile"]) or PJ.get(mw["default_projectile"])
                 if not p:
                     fail("%s: projectile %s missing" % (key, mw["default_projectile"])); continue
-                scaled = abs(k - 1.0) > 1e-9
+                gd, gr = o.get("gun") or (1.0, 1.0)
+                scaled = abs(k - 1.0) > 1e-9 or bool(o.get("gun"))
                 if scaled:
                     if mkey != PREFIX + lukey:
                         fail("%s: missile weapon should be the copy %s, is %s" % (key, PREFIX + lukey, mkey))
@@ -178,9 +179,11 @@ def main():
                     fail("%s: missile weapon changed without a factor" % key)
                 vp = PJ[MIS[v["primary_missile_weapon"]]["default_projectile"]]
                 for col in ("damage", "ap_damage", "bonus_v_large", "bonus_v_infantry"):
-                    if abs(int(float(p[col])) - round(float(vp[col] or 0) * k)) > 1:
-                        fail("%s: projectile %s %s, expected %s" % (key, col, p[col], round(float(vp[col] or 0) * k)))
-                for col in ("category", "shot_type", "explosion_type", "base_reload_time", "effective_range", "calibration_area", "projectile_number", "shots_per_volley", "burst_size", "projectile_penetration", "is_magical", "ignition_amount", "contact_stat_effect"):
+                    if abs(int(float(p[col])) - round(float(vp[col] or 0) * k * gd)) > 1:
+                        fail("%s: projectile %s %s, expected %s" % (key, col, p[col], round(float(vp[col] or 0) * k * gd)))
+                if abs(float(p["base_reload_time"]) - float(vp["base_reload_time"]) * gr) > 0.02:
+                    fail("%s: reload %s, expected %s" % (key, p["base_reload_time"], float(vp["base_reload_time"]) * gr))
+                for col in ("category", "shot_type", "explosion_type", "effective_range", "calibration_area", "projectile_number", "shots_per_volley", "burst_size", "projectile_penetration", "is_magical", "ignition_amount", "contact_stat_effect"):
                     if not same(p[col], vp[col]):
                         fail("%s: projectile %s changed %r -> %r" % (key, col, vp[col], p[col]))
                 # alternates
@@ -196,8 +199,8 @@ def main():
                         referenced.add(("missile_weapons", amw["key"])); referenced.add(("projectiles", ap_["key"]))
                         vap = PJ[MIS[j["missile_weapon"]]["default_projectile"]]
                         for col in ("damage", "ap_damage"):
-                            if abs(int(float(ap_[col])) - round(float(vap[col] or 0) * k)) > 1:
-                                fail("%s: alternate %s %s %s, expected %s" % (key, j["missile_weapon"], col, ap_[col], round(float(vap[col] or 0) * k)))
+                            if abs(int(float(ap_[col])) - round(float(vap[col] or 0) * k * gd)) > 1:
+                                fail("%s: alternate %s %s %s, expected %s" % (key, j["missile_weapon"], col, ap_[col], round(float(vap[col] or 0) * k * gd)))
         # size: entities are the vehicles or the monster, num_men counts the crew too; only a resize changes it
         want_men = a["men"] if a["men"] != b["men"] else int(mu["num_men"])
         if int(mrow["num_men"]) != want_men:

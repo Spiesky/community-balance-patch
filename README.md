@@ -26,7 +26,7 @@ See [HOW_DECISIONS_ARE_MADE.md](docs/HOW_DECISIONS_ARE_MADE.md). In short:
 
 | unit | status | page |
 |---|---|---|
-| Blood Knights | open for feedback | [units/blood_knights.md](units/blood_knights.md) |
+| Blood Knights | in the patch, open for feedback | [units/blood_knights.md](units/blood_knights.md) |
 
 ## What's in here
 
@@ -44,4 +44,4 @@ See [HOW_DECISIONS_ARE_MADE.md](docs/HOW_DECISIONS_ARE_MADE.md). In short:
 
 ## Status
 
-Pre-release. The first draft stays close to vanilla: it adjusts 334 units by at most about 20%, changes no unit sizes and leaves monsters and war machines alone for now. An earlier build loaded fine in game; this one hasn't been played yet. Units added in the latest updates stay vanilla until they're reviewed.
+Pre-release. The first draft stays close to vanilla: it adjusts 367 units by at most about 20%. The exceptions are the lore elites (Blood Knights, Grail Knights, Grail Guardians, Swords of Chaos), which are fewer and far stronger, and gunpowder, which now hits hard and reloads slow. Monsters and war machines are unchanged for now. It hasn't been played yet. Units added in the latest updates stay vanilla until they're reviewed.
