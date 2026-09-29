@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Big-picture discussion
+    url: https://github.com/OWNER/community-balance-patch/discussions
+    about: For open questions ("what should this unit be?") rather than concrete changes.

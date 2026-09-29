@@ -1,0 +1,56 @@
+name: Balance suggestion
+description: Suggest a change to a unit (or one unit family)
+title: "[Suggestion] <unit name>"
+labels: ["suggestion"]
+body:
+  - type: input
+    id: unit
+    attributes:
+      label: Unit
+      description: Name as it appears in game. One unit or one family (e.g. "Blood Knights, both variants").
+    validations:
+      required: true
+  - type: input
+    id: faction
+    attributes:
+      label: Faction / race
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Where do you see the problem?
+      options:
+        - Campaign
+        - Multiplayer / land battles
+        - Both
+    validations:
+      required: true
+  - type: dropdown
+    id: direction
+    attributes:
+      label: Direction
+      options:
+        - Too strong for its price
+        - Too weak for its price
+        - Wrong identity (doesn't feel like what it should be)
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's wrong?
+      description: What you see in battle, and why you think it happens.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you change?
+      description: Numbers if you have them (price, models, stats, abilities). "I don't know, but it's off" is fine too.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Test results, replays, screenshots, lore sources, links.
