@@ -2,7 +2,7 @@
 
 A crowd-sourced unit balance mod for Total War: WARHAMMER III.
 
-**This mod will only ever be as good as the people who use it.** There is no balance team behind it, only players. Every suggestion, every test and every argument is what shapes it. If you play it and something feels off, tell us. If nobody does, nothing gets better.
+This mod is only as good as the people who play it. There's no balance team behind it, just players like you, so every suggestion and test result helps shape it. If something feels off in your battles, we'd love to hear about it.
 
 Every recruitable unit (over a thousand of them) has been measured on one combat model and compared with what CA charges for it. That is the starting point. The rest comes from you: what you see in your own battles, what feels wrong, and what you think a unit should be.
 
