@@ -8,6 +8,8 @@ Every recruitable unit (over a thousand of them) has been measured on one combat
 
 The community is not always right, and neither is the model. A change goes in when the reasoning, the numbers and the test results agree.
 
+**Workshop:** [Community Balance Patch (Beta)](https://steamcommunity.com/sharedfiles/filedetails/?id=3810476227) · optional [Battle Logger](https://steamcommunity.com/sharedfiles/filedetails/?id=3810476307)
+
 ## How to take part
 
 - **Suggest a change:** [open a suggestion](../../issues/new?template=suggestion.yml). One unit (or one unit family) per suggestion.
