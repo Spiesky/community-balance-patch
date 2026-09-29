@@ -8,9 +8,20 @@ Each battle block starts with '#battle;v1;<date>;multiplayer=0|1;siege=0|1;mods=
 'u;alliance;army;player;unit_key;initial_men;men_alive;kills;routing;shattered'. Auto-resolved battles start with
 '#autoresolve;v1;<date>;winner=...;mods=...' and have 'a;side;player;unit_key;strength_before;strength_after' (percent).
 Battles fought without the Community
-Balance Patch loaded are counted separately (vanilla baseline).
+Balance Patch loaded are counted separately (vanilla baseline), and so are battles with other mods loaded ('+mods'),
+since those may change how units fight.
 """
 import collections, sys
+
+# our own packs: a battle with nothing else loaded is "clean" data; anything else might change how units fight
+OURS = ("community_balance_patch", "cbp_", "!!!claude_skip_intros")
+
+
+def clean(mods):
+    """True if every pack in the battle's mod list is one of ours (an unknown mod list counts as not clean)"""
+    if mods in ("unknown", ""):
+        return False
+    return all(any(p.lower().startswith(o) for o in OURS) for p in mods.split("|") if p and p != "none")
 
 
 def read(paths):
@@ -44,7 +55,7 @@ def main():
     stats = collections.defaultdict(lambda: collections.Counter())
     for b in read(args):
         patched = "community_balance_patch.pack" in b["mods"]
-        kind = "auto" if b.get("auto") else "fought"
+        kind = ("auto" if b.get("auto") else "fought") + ("" if clean(b["mods"]) else "+mods")
         for u in b["units"]:
             if only and only not in u["key"]:
                 continue
@@ -58,9 +69,9 @@ def main():
             s["lost"] += men - alive
             s["kills"] += kills
             s["routed"] += u["routing"] == "1"
-    print("%-50s %-14s %7s %7s %9s %7s" % ("unit", "version", "battles", "lost %", "kill/loss", "routed"))
+    print("%-50s %-19s %7s %7s %9s %7s" % ("unit", "version", "battles", "lost %", "kill/loss", "routed"))
     for (key, ver), s in sorted(stats.items()):
-        print("%-50s %-14s %7d %6.0f%% %9.1f %6.0f%%" % (key[:50], ver, s["battles"], 100 * s["lost"] / max(1, s["men"]),
+        print("%-50s %-19s %7d %6.0f%% %9.1f %6.0f%%" % (key[:50], ver, s["battles"], 100 * s["lost"] / max(1, s["men"]),
               s["kills"] / max(1, s["lost"]), 100 * s["routed"] / s["battles"]))
 
 

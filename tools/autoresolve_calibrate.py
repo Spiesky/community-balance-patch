@@ -9,10 +9,11 @@ with enough data on both sides.
 
     python3 autoresolve_calibrate.py logs/*.txt              prints the table and the proposed rules
     python3 autoresolve_calibrate.py --write logs/*.txt      also writes autoresolve_rules.json (autoresolve_rules.py reads it)
+    --include-modded                                         also count battles where other mods were loaded
 """
 import json, os, sys
 import vanilla as V
-from battle_logs import read
+from battle_logs import read, clean
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 RULES_JSON = os.path.join(HERE, "autoresolve_rules.json")
@@ -30,7 +31,12 @@ def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     cls = unit_class()
     agg = {}                # class -> {"fought": [lost, had, n], "auto": [...]}
+    with_mods = "--include-modded" in sys.argv
+    skipped = 0
     for b in read(args):
+        if not with_mods and not clean(b["mods"]):
+            skipped += 1                # other mods may change how units fight: clean battles only, unless asked
+            continue
         kind = "auto" if b.get("auto") else "fought"
         for u in b["units"]:
             if u.get("player") not in (None, "1"):
@@ -61,7 +67,8 @@ def main():
                 rule = "%+.2f" % value
         print("%-10s %8d %8d %8s %8s %8s" % (c, f[2], a[2], "%.0f%%" % (100 * fr) if fr is not None else "-",
                                              "%.0f%%" % (100 * ar) if ar is not None else "-", rule))
-    print("\nproposed rules:", rules or "none yet")
+    print("\n%d battles with other mods left out (--include-modded counts them)" % skipped if skipped else "")
+    print("proposed rules:", rules or "none yet")
     if "--write" in sys.argv:
         json.dump(dict(rules=rules, source="battle logs", min_units=MIN_UNITS), open(RULES_JSON, "w"), indent=1)
         print("wrote", RULES_JSON)
