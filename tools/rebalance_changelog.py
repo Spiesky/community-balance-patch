@@ -31,6 +31,8 @@ def line(o):
     k = o.get("k") or 1.0
     if abs(k - 1) > 1e-9:
         parts.append("damage %s" % pct(1.0, k))
+    if o.get("gun"):
+        parts.append("each volley %s harder, reload %s slower" % (pct(1.0, o["gun"][0]), pct(1.0, o["gun"][1])))
     if o["new_cost"] != o["cost"]:
         parts.append("price %d → %d" % (o["cost"], o["new_cost"]))
     if o["action"] == "decided":
@@ -38,7 +40,9 @@ def line(o):
         parts = ["attack %d → %d, defence %d → %d, charge %d → %d, HP %.0f → %.0f, leadership %.0f → %.0f, armour %.0f → %.0f, price %d → %d" % (
             b["ma"], a["ma"], b["md"], a["md"], b["cb"], a["cb"], b["hp"], a["hp"], b["morale"], a["morale"], b["armour"], a["armour"], o["cost"], o["new_cost"])]
     note = o["note"]
-    if o["action"] in ("lore", "decided") and ". " in note:
+    if o["action"] == "gunpowder":
+        why = "Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety"
+    elif o["action"] in ("lore", "decided") and ". " in note:
         why = note.split(". ", 1)[1].rstrip(".")           # the ladder's own words, not the arithmetic
     else:
         why = note.split(". ")[0].rstrip(".")
@@ -51,14 +55,17 @@ def main():
     with open(OUT, "w") as out:
         w = out.write
         w("# Community Balance Patch: what changed\n\n")
-        w("%d units across every faction. This is vanilla, adjusted: no unit changes size, no unit's strength or price "
-          "moves more than about 20%%, a stronger unit never gets cheaper and a weaker one never dearer, and regiments of "
+        w("%d units across every faction. This is vanilla, adjusted: apart from the lore elites below no unit changes size, "
+          "no unit's strength or price moves more than about 20%%, a stronger unit never gets cheaper and a weaker one never dearer, and regiments of "
           "renown move with their base unit. Every change keeps the unit's shape: charge, armour, speed, abilities, weapon "
           "type and splash never move; attack, defence, HP and damage move together. Percentages are against vanilla. "
           "See `docs/METHOD.md` for how units are measured.\n\n" % len(changed))
         w("**The headlines.** Elite infantry and elite cavalry are worth their price: Chaos Warriors, Chosen, Greatswords, "
           "Grave Guard, Temple Guard, Phoenix Guard, Grail Knights and Blood Knights all get a real step up over the line "
-          "troops below them. Chaff stays chaff and stays cheap. Monsters, war beasts, chariots and war machines are "
+          "troops below them. Blood Knights, Grail Knights, Grail Guardians and the Swords of Chaos are fewer and far stronger, "
+          "never with less total health than vanilla. Gunpowder hits hard and reloads slow: handguns, rifles, jezzails, "
+          "blunderbusses and pistols fire a much heavier volley and take half again as long to reload. Chaff stays chaff "
+          "and stays cheap. Monsters, war beasts, chariots and war machines are "
           "unchanged for now; they are open questions for the community, as are unit sizes.\n\n")
         for fac in sorted(UM.FACTION_NAMES, key=lambda x: UM.FACTION_NAMES[x]):
             os_ = [o for o in changed if o["faction"] == fac]

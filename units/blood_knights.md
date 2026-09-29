@@ -1,38 +1,32 @@
 # Blood Knights
 
-**Status:** open for feedback. Both variants (sword and shield, lances).
+**Status:** in the patch, open for feedback. Both variants (sword and shield, lances).
 
-## Why they're disputed
+## The idea
 
-Every rider of the Blood Dragon order is a vampire (tabletop around WS5 S5 T5 W2 A2), frenzied, in plate, on a nightmare steed. The game gives each one the health of a mortal knight and fields a full-size regiment of them. Many players feel they should be a small, terrifying elite instead.
+Every rider of the Blood Dragon order is a vampire (tabletop around WS5 S5 T5 W2 A2), frenzied, in plate, on a nightmare steed. Vanilla gives each one the health of a mortal knight and fields 60 of them. The patch makes them what the lore says: fewer riders, each one a vampire.
 
-## What the patch does now
+## What the patch does
 
-It stays close to vanilla: same unit size, about 20% stronger.
+| | riders | melee attack / defence | HP per rider | total HP | weapon damage | price |
+|---|---|---|---|---|---|---|
+| Blood Knights (sword and shield), vanilla | 60 | 46 / 54 | 120 | 7200 | 38 + 21 AP, +16 vs infantry | 1550 |
+| patch | **24** | 54 / 62 | **300** | 7200 | 96 + 52 AP, +40 vs infantry | 2475 |
+| Blood Knights (lances), vanilla | 60 | 42 / 42 | 120 | 7200 | 35 + 19 AP, +22 vs large | 1650 |
+| patch | **24** | 50 / 50 | **300** | 7200 | 88 + 47 AP, +55 vs large | 2250 |
 
-| | riders | melee attack / defence | HP per rider | weapon damage | price |
-|---|---|---|---|---|---|
-| Blood Knights (sword and shield), vanilla | 60 | 46 / 54 | 120 | 38 + 21 AP, +16 vs infantry | 1550 |
-| patch | 60 | 48 / 56 | 142 | 46 + 25 AP, +19 vs infantry | 1850 |
-| Blood Knights (lances), vanilla | 60 | 42 / 42 | 120 | 35 + 19 AP, +22 vs large | 1650 |
-| patch | 60 | 44 / 44 | 143 | 42 + 22 AP, +26 vs large | 1650 |
+The rule for every unit made smaller: **it never ends up with less total health than vanilla.** 24 vampires have the same 7,200 health as 60 mortal-grade riders, and each one hits far harder.
 
-The lances were already priced above what they deliver, so they get stronger at the same price. The sword and shield version was cheap for what it does, so its price rises with the power.
-
-## The bigger idea: fewer, stronger vampires
-
-An earlier draft cut both units to 24 riders, each worth several mortal knights. It went too far: with the health split badly, 24 riders ended up with less total health than vanilla's 60 (3,720 against 7,200 for the sword and shield version), so they would have melted to arrows and spells.
-
-If the community wants a small elite unit, the rule would be that it never has less total health than vanilla: at least 300 HP per rider at 24 riders.
+Against chaff this shows. Assuming the enemy never routs, patched Blood Knights kill about 750 Skavenslaves for every rider they lose (vanilla: about 90).
 
 ## Open questions for you
 
-1. Should Blood Knights stay a full regiment that's a bit stronger (what the patch does now), or become a small elite unit?
-2. Campaign vs multiplayer: are they too strong, too weak or about right in each right now?
-3. Is 1850 fair for the sword and shield version?
+1. Does a 24-rider regiment feel right in battle, or should it be 30 or 20?
+2. Are the prices right: 2475 for sword and shield, 2250 for lances?
+3. Campaign vs multiplayer: too strong, too weak or about right in each?
 
 ## Tests we need
 
 - Patched Blood Knights against Demigryph Knights, Grail Knights and Chaos Knights at equal gold.
 - Patched Blood Knights charging into Halberdiers and into Chaos Warriors.
-- The same fights with vanilla Blood Knights, as the baseline.
+- How long they survive under missile fire compared with vanilla.

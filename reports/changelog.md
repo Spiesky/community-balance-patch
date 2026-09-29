@@ -1,8 +1,8 @@
 # Community Balance Patch: what changed
 
-334 units across every faction. This is vanilla, adjusted: no unit changes size, no unit's strength or price moves more than about 20%, a stronger unit never gets cheaper and a weaker one never dearer, and regiments of renown move with their base unit. Every change keeps the unit's shape: charge, armour, speed, abilities, weapon type and splash never move; attack, defence, HP and damage move together. Percentages are against vanilla. See `docs/METHOD.md` for how units are measured.
+367 units across every faction. This is vanilla, adjusted: apart from the lore elites below no unit changes size, no unit's strength or price moves more than about 20%, a stronger unit never gets cheaper and a weaker one never dearer, and regiments of renown move with their base unit. Every change keeps the unit's shape: charge, armour, speed, abilities, weapon type and splash never move; attack, defence, HP and damage move together. Percentages are against vanilla. See `docs/METHOD.md` for how units are measured.
 
-**The headlines.** Elite infantry and elite cavalry are worth their price: Chaos Warriors, Chosen, Greatswords, Grave Guard, Temple Guard, Phoenix Guard, Grail Knights and Blood Knights all get a real step up over the line troops below them. Chaff stays chaff and stays cheap. Monsters, war beasts, chariots and war machines are unchanged for now; they are open questions for the community, as are unit sizes.
+**The headlines.** Elite infantry and elite cavalry are worth their price: Chaos Warriors, Chosen, Greatswords, Grave Guard, Temple Guard, Phoenix Guard, Grail Knights and Blood Knights all get a real step up over the line troops below them. Blood Knights, Grail Knights, Grail Guardians and the Swords of Chaos are fewer and far stronger, never with less total health than vanilla. Gunpowder hits hard and reloads slow: handguns, rifles, jezzails, blunderbusses and pistols fire a much heavier volley and take half again as long to reload. Chaff stays chaff and stays cheap. Monsters, war beasts, chariots and war machines are unchanged for now; they are open questions for the community, as are unit sizes.
 
 ## Beastmen (9)
 
@@ -18,8 +18,8 @@
 
 ## Bretonnia (10)
 
-- **Grail Guardians**: attack +1, defence +1; HP +13%; damage +13%; price 1850 → 2225. *Grail Guardians: Grail Knights sworn to guard a Grail Chapel, the Lady's own wardens.*
-- **Grail Knights**: attack +2, defence +2; HP +20%; damage +20%. *Grail Knights have drunk from the Grail and are more than mortal: WS5 S4 I5 A2 with the Lady's full blessing. A handful routs whole regiments.*
+- **Grail Guardians**: 32 → 24 models; attack +3, defence +3; HP +33%; damage +33%; price 1850 → 2225. *Grail Guardians: Grail Knights sworn to guard a Grail Chapel, the Lady's own wardens.*
+- **Grail Knights**: 48 → 32 models; attack +4, defence +4; HP +50%; damage +50%. *Grail Knights have drunk from the Grail and are more than mortal: WS5 S4 I5 A2 with the Lady's full blessing. A handful routs whole regiments.*
 - **Knights of the Lionhearted (Knights of the Realm)**: HP -3%; damage -3%. *regiment of renown: follows Knights of the Realm (power x0.97, price x1.00).*
 - **Knights of the Realm**: HP -4%; damage -5%. *Knights of the Realm: WS4 S3 T3, the Lady's blessing, the lance wedge.*
 - **Mounted Yeomen**: HP +3%; damage +4%; price 400 → 475. *Bretonnian commoners allowed a horse: WS3 at best.*
@@ -29,7 +29,7 @@
 - **The Holy Wardens of La Maisontaal (Battle Pilgrims)**: attack +1, defence +1; HP +10%; damage +10%. *regiment of renown: follows Battle Pilgrims (power x1.11, price x1.00).*
 - **Royal Hippogryph Knights**: HP +1%; damage +1%. *Royal Hippogryph Knights: knights on hippogryphs, monsters in their own right.*
 
-## Chaos Dwarfs (8)
+## Chaos Dwarfs (11)
 
 - **Bull Centaur Renders**: HP -2%; damage -3%. *Bull Centaurs: WS4 S4 T5 W3 A2 Ld9, Hashut's taurus-blooded sons.*
 - **Bull Centaur Renders (Dual Axes)**: HP -2%; damage -2%. *Bull Centaurs: WS4 S4 T5 W3 A2 Ld9, Hashut's taurus-blooded sons.*
@@ -39,6 +39,9 @@
 - **Infernal Guard (Great Weapons)**: attack +1, defence +1; HP +16%; damage +16%; price 1000 → 1050. *Infernal Guard: the Tower of Zharr's oath-bound, faceless in blackshard armour.*
 - **Infernal Ironsworn**: attack +1, defence +1; HP +13%; damage +13%; price 1400 → 1550. *Infernal Ironsworn: the Guard's champions.*
 - **The Immortals (Infernal Ironsworn)**: attack +1, defence +1; HP +9%; damage +10%; price 1650 → 1825. *regiment of renown: follows Infernal Ironsworn (power x1.11, price x1.11).*
+- **Chaos Dwarf Blunderbusses**: each volley +60% harder, reload +50% slower; price 900 → 925. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Infernal Guard (Fireglaives)**: each volley +60% harder, reload +50% slower; price 1200 → 1225. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **The Granite Guard (Chaos Dwarf Blunderbusses)**: each volley +60% harder, reload +50% slower; price 1200 → 1225. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 
 ## Dark Elves (15)
 
@@ -58,7 +61,7 @@
 - **The Hellebronai (Dreadspears)**: attack +1, defence +1; HP +6%; damage +7%. *regiment of renown: follows Dreadspears (power x1.09, price x1.00).*
 - **Witch Elves**: attack +1, defence +1; HP +14%; damage +14%; price 750 → 775. *Witch Elves: frenzied, poisoned, A2, no armour at all.*
 
-## Dwarfs (16)
+## Dwarfs (21)
 
 - **Dragonback Slayers (Slayers)**: attack +1, defence +1; HP +10%; damage +10%; price 1200 → 1375. *regiment of renown: follows Slayers (power x1.12, price x1.14).*
 - **Dwarf Warriors**: attack +1, defence +1; HP +8%; damage +7%; price 450 → 550. *Dwarf Warriors: WS4 S3 T4, gromril-grade discipline. Every dwarf is a veteran of something.*
@@ -76,12 +79,19 @@
 - **Slayers (Grudge Settlers)**: attack +1, defence +1; HP +10%; damage +10%; price 900 → 1075. *Slayers: WS4 S3 T4 unbreakable, seeking a good death; each one has already killed something large.*
 - **The Grumbling Guard (Longbeards – Great Weapons)**: attack +1, defence +1; HP +8%; damage +8%; price 1000 → 1200. *regiment of renown: follows Longbeards (Great Weapons) (power x1.09, price x1.20).*
 - **Warriors of Dragonfire Pass (Dwarf Warriors)**: attack +1, defence +1; HP +10%; damage +10%; price 700 → 850. *regiment of renown: follows Dwarf Warriors (power x1.13, price x1.22).*
+- **Long Drong's Slayer Pirates**: each volley +60% harder, reload +50% slower; price 900 → 950. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Slayer Pirates**: each volley +60% harder, reload +50% slower; price 750 → 800. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **The Grimdelvers (Thunderers)**: each volley +60% harder, reload +50% slower; price 950 → 975. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Thunderers**: each volley +60% harder, reload +50% slower; price 700 → 725. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Thunderers (Grudge-Rakers)**: each volley +60% harder, reload +50% slower; price 850 → 875. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 
-## Grand Cathay (5)
+## Grand Cathay (7)
 
 - **Peasant Horsemen**: attack -2, defence -2; HP -15%; damage -16%; price 400 → 375. *Cathay's peasant levies on horseback.*
 - **Celestial Dragon Guard**: attack +1, defence +1; HP +16%; damage +16%; price 1000 → 1025. *Celestial Dragon Guard: the Dragon Emperor's own, in celestial armour; vanilla rates them as heavy line.*
 - **The Dune Dragons (Celestial Dragon Guard)**: attack +1, defence +1; HP +16%; damage +16%; price 1300 → 1325. *regiment of renown: follows Celestial Dragon Guard (power x1.19, price x1.02).*
+- **Crane Gunners**: each volley +60% harder, reload +50% slower; price 1000 → 1025. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Iron Hail Gunners**: each volley +60% harder, reload +50% slower; price 500 → 525. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 - **Great Longma Riders**: attack +2, defence +2; HP +20%; damage +20%; price 1350 → 1475. *Longma: celestial horse-dragons of Cathay, magical and strong.*
 - **Righteous Lances of Wei-Jin (Great Longma Riders)**: attack +2, defence +2; HP +20%; damage +20%; price 1650 → 1800. *regiment of renown: follows Great Longma Riders (power x1.21, price x1.09).*
 
@@ -139,16 +149,17 @@
 - **Knights of the Brazen Throne (Skullcrushers of Khorne)**: attack +2, defence +2; HP +19%; damage +19%; price 1900 → 2100. *regiment of renown: follows Skullcrushers of Khorne (power x1.21, price x1.10).*
 - **Skullcrushers of Khorne**: attack +2, defence +2; HP +19%; damage +19%; price 1700 → 1875. *Skullcrushers: WS5 S5 Chaos Knights of Khorne on T5 W3 juggernauts of brass.*
 
-## Kislev (13)
+## Kislev (14)
 
 - **Gryphon Legion**: attack +2, defence +2; HP +21%; damage +21%. *Kislev's Gryphon Legion: the Tzarina's elite winged heavy horse.*
 - **Kossovite Dervishes**: attack +1, defence +1; HP +17%; damage +17%; price 525 → 625. *Kislev's Ungol-descended horse archers and raiders.*
 - **Winged Lancers**: attack +2, defence +2; HP +22%; damage +22%. *Kislev's winged lancers: shock cavalry of the oblast.*
-- **Akshina Ambushers**: price 850 → 800. *Akshina Ambushers: the community's -50g (6.3 list).*
-- **Boydinov's Brawlers (Streltsi)**: price 1150 → 1125. *regiment of renown: follows Streltsi (power x1.00, price x0.97).*
+- **Armoured Kossars**: each volley +60% harder, reload +50% slower; price 700 → 750. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Armoured Kossars (Great Weapons)**: each volley +60% harder, reload +50% slower; price 700 → 725. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Boydinov's Brawlers (Streltsi)**: each volley +60% harder, reload +50% slower; price 1150 → 1175. *regiment of renown: follows Streltsi (power x1.00, price x0.97); gunpowder: volley x1.60, reload x1.50.*
 - **Kossars**: price 450 → 425. *Kossars: the model over-rates hybrids; the community's -25g (6.3 list).*
 - **Kossars (Spears)**: price 500 → 475. *Kossars: the model over-rates hybrids; the community's -25g (6.3 list).*
-- **Streltsi**: price 850 → 825. *Streltsi: the community's -25g (6.3 list).*
+- **Streltsi**: each volley +60% harder, reload +50% slower. *Streltsi: the community's -25g (6.3 list).; gunpowder: volley x1.60, reload x1.50.*
 - **The Wolfhearts (Akshina Ambushers)**: price 1150 → 1075. *regiment of renown: follows Akshina Ambushers (power x1.00, price x0.94).*
 - **Oath-Brothers of Tor (War Bear Riders)**: attack +1, defence +1; HP +12%; damage +12%. *regiment of renown: follows War Bear Riders (power x1.14, price x1.00).*
 - **The Mordheim Balewolves (The Things in the Woods)**: attack -2, defence -2; HP -16%; damage -16%. *regiment of renown: follows The Things in the Woods (power x0.83, price x1.00).*
@@ -205,7 +216,7 @@
 - **Plaguebearers of Nurgle**: attack +1, defence +1; HP +13%; damage +13%; price 700 → 825. *Plaguebearers: T4 and a ward, poisoned plagueswords, slow and patient.*
 - **Plague Drones of Nurgle**: attack +1, defence +1; HP +7%; damage +7%; price 1100 → 1275. *Plague Drones: plaguebearers on rot flies, W3 T5 daemons.*
 
-## Ogre Kingdoms (11)
+## Ogre Kingdoms (13)
 
 - **Eshin Maneater**: price 1250 → 1500. *The Eshin Maneater: one ogre assassin; the stats are the lore, the price moves to what they are worth.*
 - **Crushers (Great Weapons)**: attack +1, defence +1; HP +12%; damage +12%. *Crushers: ogres on rhinox-sized beasts, the heaviest cavalry of the Mountains of Mourn.*
@@ -214,12 +225,14 @@
 - **Mournfang Cavalry (Ironfists)**: HP +1%; damage +1%; price 1200 → 1450. *Mournfang Cavalry: ogres (W3 T4) on mournfang (W4 T5), a wall of fur and iron.*
 - **Sky-Striders (Crushers – Great Weapons)**: attack +1, defence +1; HP +12%; damage +12%. *regiment of renown: follows Crushers (Great Weapons) (power x1.13, price x1.00).*
 - **Amblepeak Greybacks (Yhetees)**: attack +1, defence +1; HP +10%; damage +10%. *regiment of renown: follows Yhetees (power x1.12, price x1.00).*
+- **Maneaters (Ogre Pistols)**: each volley +60% harder, reload +50% slower; price 1500 → 1550. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 - **Ogre Bulls**: attack +1, defence +1; HP +17%; damage +17%; price 550 → 650. *Ogre Bulls: S4 T4 W3 A3, an ogre is an ogre whatever it carries; vanilla makes a Bull a third of an Irongut.*
 - **Ogre Bulls (Dual Weapons)**: attack +1, defence +1; HP +17%; damage +17%; price 650 → 775. *Ogre Bulls: S4 T4 W3 A3, an ogre is an ogre whatever it carries; vanilla makes a Bull a third of an Irongut.*
 - **Ogre Bulls (Ironfists)**: attack +1, defence +1; HP +17%; damage +17%; price 650 → 775. *Ogre Bulls: S4 T4 W3 A3, an ogre is an ogre whatever it carries; vanilla makes a Bull a third of an Irongut.*
+- **Powder-Guts (Maneaters – Ogre Pistols)**: each volley +60% harder, reload +50% slower; price 1800 → 1850. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 - **Yhetees**: attack +1, defence +1; HP +10%; damage +10%. *Yhetees: S5 T4 W3 A3 and faster than anything their size.*
 
-## Skaven (12)
+## Skaven (15)
 
 - **Blightscab's Plaguepack (Plague Monk Censer Bearers)**: attack +1, defence +1; HP +9%; damage +9%. *regiment of renown: follows Plague Monk Censer Bearers (power x1.10, price x1.00).*
 - **Council Guard (Stormvermin – Halberds)**: attack +1, defence +1; HP +15%; damage +15%. *regiment of renown: follows Stormvermin (Halberds) (power x1.19, price x1.00).*
@@ -231,6 +244,9 @@
 - **Stormvermin (Halberds)**: attack +1, defence +1; HP +16%; damage +16%. *Stormvermin: black-furred, heavy armour, WS4; the elite of the clanrats, still numerous.*
 - **Stormvermin (Swords & Shields)**: attack +1, defence +1; HP +16%; damage +17%. *Stormvermin: black-furred, heavy armour, WS4; the elite of the clanrats, still numerous.*
 - **Visktrin's Death Squad (Death Runners)**: attack +1, defence +1; HP +14%; damage +14%; price 1150 → 1275. *regiment of renown: follows Death Runners (power x1.17, price x1.12).*
+- **Eye-Takers (Warplock Jezzails)**: each volley +60% harder, reload +50% slower; price 1400 → 1450. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Natty Buboe's Sharpshooters (Warplock Jezzails)**: each volley +60% harder, reload +50% slower; price 1300 → 1350. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Warplock Jezzails**: each volley +60% harder, reload +50% slower; price 1000 → 1025. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 - **Pit Fighters of Hell’s Deep (Rat Ogres)**: attack +1, defence +1; HP +8%; damage +8%; price 1050 → 1275. *regiment of renown: follows Rat Ogres (power x1.08, price x1.21).*
 - **Rat Ogres**: attack +1, defence +1; HP +7%; damage +7%; price 700 → 850. *Rat Ogres: S5 T4 W3 A3 of Moulder's making.*
 
@@ -252,7 +268,7 @@
 - **The Princes of Perfection (Devoted Marauders of Slaanesh – Spears)**: attack +1, defence +1; HP +13%; damage +13%. *regiment of renown: follows Devoted Marauders of Slaanesh (Spears) (power x1.16, price x1.00).*
 - **Fiends of Slaanesh**: attack +1, defence +1; HP +17%; damage +17%. *Fiends: daemon-beasts, S4 T4 W3 and four attacks each, faster than horses; vanilla has them as slow trolls.*
 
-## The Empire (19)
+## The Empire (28)
 
 - **Knights of the Black Rose**: attack 36 → 36, defence 50 → 52, charge 34 → 30, HP 126 → 136, leadership 75 → 85, armour 120 → 120, price 1250 → 1250. *They do not charge, they hold, and they do not rout.*
 - **Knights of the Blazing Sun**: attack 40 → 40, defence 26 → 27, charge 78 → 74, HP 116 → 116, leadership 70 → 70, armour 100 → 120, price 1200 → 1200. *Hardest charge in the Empire, and the least to show for it once the charge is spent.*
@@ -269,8 +285,17 @@
 - **Spearmen (Shields)**: attack +1, defence +1; HP +14%; damage +14%; price 350 → 425. *Spearmen: the cheapest state troop, a wall that holds if nothing pushes.*
 - **Swords of Ulric (Swordsmen)**: HP +1%; damage +1%; price 550 → 650. *regiment of renown: follows Swordsmen (power x1.01, price x1.20).*
 - **Swordsmen**: HP +3%; damage +2%; price 375 → 450. *State troops with sword and shield: WS3 S3 T3, drilled, not heroic.*
-- **Pistoliers**: attack -2, defence -2; HP -16%; damage -16%. *residual -0.15: power x0.83 to what the price pays for; -5% of price still unresolved after the caps.*
-- **The Noble Sons Abroad (Pistoliers)**: attack -1, defence -1; HP -14%; damage -14%. *regiment of renown: follows Pistoliers (power x0.85, price x1.00).*
+- **Pistoliers**: attack -2, defence -2; HP -16%; damage -16%; each volley +60% harder, reload +50% slower. *residual -0.15: power x0.83 to what the price pays for; -5% of price still unresolved after the caps; gunpowder: volley x1.60, reload x1.50.*
+- **The Noble Sons Abroad (Pistoliers)**: attack -1, defence -1; HP -14%; damage -14%; each volley +60% harder, reload +50% slower. *regiment of renown: follows Pistoliers (power x0.85, price x1.00); gunpowder: volley x1.60, reload x1.50.*
+- **Amethyst Ironsides**: each volley +60% harder, reload +50% slower; price 1025 → 1100. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Free Company Militia**: each volley +60% harder, reload +50% slower; price 450 → 525. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Gunderman's Surefires (Handgunners)**: each volley +60% harder, reload +50% slower; price 800 → 825. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Handgunners**: each volley +60% harder, reload +50% slower; price 600 → 625. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Hochland Long Rifles**: each volley +60% harder, reload +50% slower; price 900 → 925. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Nuln Ironsides**: each volley +60% harder, reload +50% slower; price 825 → 900. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Stirland's Revenge (Free Company Militia)**: each volley +60% harder, reload +50% slower; price 800 → 925. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **The Hergig Jaegerkorps (Hochland Long Rifles)**: each volley +60% harder, reload +50% slower; price 1200 → 1225. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **The Silver Bullets (Handgunners)**: each volley +60% harder, reload +50% slower; price 850 → 875. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 - **Demigryph Knights (Halberds)**: attack +1, defence +1; HP +13%; damage +14%; price 1450 → 1500. *Demigryph Knights: order knights on W3 T4 half-griffon beasts.*
 - **The Royal Altdorf Gryphites (Demigryph Knights)**: attack 43 → 52, defence 45 → 52, charge 60 → 78, HP 233 → 256, leadership 90 → 90, armour 125 → 125, price 1850 → 2000. *Best in the Empire at everything, and priced so that fielding two of them hurts.*
 
@@ -300,16 +325,23 @@
 - **Changebringers**: price 1500 → 1250. *Changebringers: over-priced Flamers with a name; the stats are the lore, the price moves.*
 - **Flamers of Tzeentch**: price 800 → 950. *Flamers: the survey says a bargain at 800; the stats are the lore, the price moves.*
 
-## Vampire Coast (1)
+## Vampire Coast (8)
 
+- **Deck Gunners**: each volley +60% harder, reload +50% slower; price 700 → 725. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Sartosa Militia**: each volley +60% harder, reload +50% slower; price 450 → 525. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Shadewraith Gunners (Deck Gunners)**: each volley +60% harder, reload +50% slower; price 1050 → 1075. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **The Black Spot (Zombie Pirate Gunnery Mob – Handgunners)**: each volley +60% harder, reload +50% slower; price 800 → 825. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Zombie Pirate Gunnery Mob**: each volley +60% harder, reload +50% slower. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Zombie Pirate Gunnery Mob (Hand Cannons)**: each volley +60% harder, reload +50% slower; price 500 → 525. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Zombie Pirate Gunnery Mob (Handgunners)**: each volley +60% harder, reload +50% slower; price 550 → 575. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 - **Animated Hulks**: price 500 → 600. *Animated Hulks: big stitched brutes; the survey says a bargain at 500. The stats are the lore, the price moves.*
 
-## Vampire Counts (16)
+## Vampire Counts (17)
 
 - **Black Knights**: attack +1, defence +1; HP +15%; damage +15%; price 950 → 975. *Black Knights: WS3 S4 T4 wights on skeletal steeds, ethereal-adjacent dread.*
 - **Black Knights (Lances & Barding)**: HP -3%; damage -3%; price 1050 → 1000. *Black Knights: WS3 S4 T4 wights on skeletal steeds, ethereal-adjacent dread.*
-- **Blood Knights**: attack +2, defence +2; HP +18%; damage +18%; price 1550 → 1850. *Blood Knights of the Blood Dragon order: every rider is a vampire, WS5 S5 T5 W2 A2 in plate. One is worth a regiment of mortal knights.*
-- **Blood Knights (Lances)**: attack +2, defence +2; HP +19%; damage +19%. *Blood Knights of the Blood Dragon order: every rider is a vampire, WS5 S5 T5 W2 A2 in plate. One is worth a regiment of mortal knights.*
+- **Blood Knights**: 60 → 24 models; attack +8, defence +8; HP +150%; damage +150%; price 1550 → 2475. *Blood Knights of the Blood Dragon order: every rider is a vampire, WS5 S5 T5 W2 A2 in plate. One is worth a regiment of mortal knights.*
+- **Blood Knights (Lances)**: 60 → 24 models; attack +8, defence +8; HP +150%; damage +150%; price 1650 → 2250. *Blood Knights of the Blood Dragon order: every rider is a vampire, WS5 S5 T5 W2 A2 in plate. One is worth a regiment of mortal knights.*
 - **Hexwraiths**: attack +2, defence +2; HP +19%; damage +19%. *Hexwraiths: ethereal wraiths whose scythes pass through armour and flesh alike.*
 - **The Chillgheists (Hexwraiths)**: attack +2, defence +2; HP +19%; damage +20%. *regiment of renown: follows Hexwraiths (power x1.21, price x1.00).*
 - **Verek's Reavers (Black Knights – Lances & Barding)**: HP -3%; damage -2%; price 1300 → 1250. *regiment of renown: follows Black Knights (Lances & Barding) (power x0.98, price x0.95).*
@@ -319,6 +351,7 @@
 - **Grave Guard (Halberds)**: attack +1, defence +1; HP +15%; damage +15%. *Grave Guard: wights in ancient armour, S4 T4 killing blow; vanilla rates them as levies in plate.*
 - **The Feasters in the Dusk (Crypt Ghouls)**: attack +1, defence +1; HP +16%; damage +16%; price 800 → 925. *regiment of renown: follows Crypt Ghouls (power x1.18, price x1.17).*
 - **The Sternsmen (Grave Guard)**: attack +1, defence +1; HP +15%; damage +15%. *regiment of renown: follows Grave Guard (power x1.19, price x1.00).*
+- **Sylvanian Handgunners**: each volley +60% harder, reload +50% slower; price 600 → 625. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 - **Crypt Horrors**: HP +5%; damage +5%; price 900 → 1025. *Crypt Horrors: T5 W3 with regeneration and poison.*
 - **The Devils of Swartzhafen (Vargheists)**: attack +1, defence +1; HP +15%; damage +15%. *regiment of renown: follows Vargheists (power x1.17, price x1.00).*
 - **Vargheists**: attack +1, defence +1; HP +15%; damage +15%. *Vargheists: vampires gone to the beast, S5 T4 W3 A3 and flying.*
@@ -334,7 +367,7 @@
 - **Chaos Knights of Slaanesh**: attack +1, defence +1; HP +17%; damage +17%; price 1400 → 1600. *Chaos Knights: WS5 S5 T4 A2 in Chaos armour on daemonic steeds, the most favoured warriors of the gods.*
 - **Chaos Knights of Slaanesh (Lances)**: attack +2, defence +2; HP +20%; damage +20%; price 1400 → 1500. *Chaos Knights: WS5 S5 T4 A2 in Chaos armour on daemonic steeds, the most favoured warriors of the gods.*
 - **Chaos Knights of Tzeentch (Lances)**: attack +2, defence +2; HP +20%; damage +20%. *Chaos Knights: WS5 S5 T4 A2 in Chaos armour on daemonic steeds, the most favoured warriors of the gods.*
-- **Swords of Chaos (Chaos Knights)**: attack +1, defence +1; HP +17%; damage +17%; price 1500 → 1725. *regiment of renown: follows Chaos Knights (power x1.19, price x1.15).*
+- **Swords of Chaos (Chaos Knights)**: attack +6, defence +6; HP +85%; damage +85%; price 1500 → 2400. *The Swords of Chaos: Archaon's own retinue, the Everchosen's knights. Very few ride with him, each a champion who has survived the gods' favour for lifetimes; their Apocalyptic Charge breaks armies.*
 - **Chaos Warriors**: attack +1, defence +1; HP +17%; damage +17%; price 750 → 850. *Chaos Warriors: WS5 S4 T4 A2 in Chaos plate, each one worth three state troops. Vanilla rates them at two.*
 - **Chaos Warriors**: attack +1, defence +1; HP +17%; damage +17%; price 750 → 850. *Chaos Warriors: WS5 S4 T4 A2 in Chaos plate, each one worth three state troops. Vanilla rates them at two.*
 - **Chaos Warriors (Great Weapons)**: attack +1, defence +1; HP +18%; damage +18%; price 825 → 875. *Chaos Warriors: WS5 S4 T4 A2 in Chaos plate, each one worth three state troops. Vanilla rates them at two.*

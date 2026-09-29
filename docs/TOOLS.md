@@ -14,6 +14,8 @@ installed game into `vanilla_db/` (not in git, see below).
     python3 rebalance_check.py         # every pack row matches its proposal
     python3 test_rebalance.py          # the invariants as tests; run after any change
     python3 sense_check.py             # does the patch make sense: sizes, directions, limits, roster order, fairness
+    python3 grind_check.py             # elites against chaff: kills per model lost, vanilla and patched
+    python3 gunpowder.py               # the units the gunpowder rule covers
     python3 rebalance_verify.py        # equal-gold duels, vanilla vs patched
     python3 rebalance_changelog.py     # -> reports/changelog.md, the player-facing list
     python3 rebalance_ladder_view.py   # -> reports/ladder.md, every roster in ladder order
@@ -39,9 +41,17 @@ stats.
 
 ## Decisions already made
 
-- **Close to vanilla.** The patch adjusts CA's balance, it does not replace it. No unit changes size, no unit's
-  strength or price moves more than about 20% (`POWER_LIMIT`, `PRICE_LIMIT`, `RESIZE` at the top of
-  `rebalance_solve.py`). Bigger ideas (fewer, stronger Blood Knights) are community questions first.
+- **Close to vanilla.** The patch adjusts CA's balance, it does not replace it. No unit's strength or price moves
+  more than about 20% (`POWER_LIMIT`, `PRICE_LIMIT` at the top of `rebalance_solve.py`), and unit sizes stay vanilla
+  (`RESIZE`), with one exception:
+- **The lore elites are fewer and far stronger** (`ELITE`): Blood Knights, Grail Knights, Grail Guardians and the Swords
+  of Chaos take the lore's size and strength. A unit made smaller never has less total health than vanilla, and its
+  price never rises faster than its strength (at most x1.6).
+- **Elites grind chaff.** A unit of Grail Knights should be able to kill Skavenslaves more or less for ever.
+  `grind_check.py` measures it.
+- **Gunpowder hits hard and reloads slow** (`gunpowder.py`): single-shot firearms fire a 60% heavier volley and take
+  50% longer to reload, so they are played by getting into position, firing, then pulling back or reloading in
+  safety. Damage over time barely moves (+7%).
 - **Changes make sense on their own.** A stronger unit never gets cheaper and a weaker one never dearer; a unit whose
   stats move keeps its price. Regiments of renown move with their base unit. A final pass reverts any change that makes
   a dearer unit weaker than a cheaper one in the same roster. `sense_check.py` checks all of it.
@@ -68,9 +78,9 @@ stats.
 3. **58 units from the recent updates are unreviewed** (`tools/unreviewed.txt`: Lords of the End Times and others).
    They stay vanilla until they get ladder lines.
 4. **Pending decisions**, kept as vanilla until made: Centigors, the Thundertusk.
-5. **Unit sizes and monsters**: the draft's bigger ideas (24 Blood Knights, 80-model guards, stronger monsters) are
-   off until the community weighs in. See `units/blood_knights.md`.
-6. **Gunpowder**: planned next (handguns, crossbows and war machines since the reload changes).
+5. **Guards at 80 models and stronger monsters** are off until the community weighs in.
+6. **Pistoliers** lose 16% (the model rates them a bargain) on top of the gunpowder change; worth a look in game.
+7. **Artillery and gunpowder war machines** are not covered by the gunpowder rule yet.
 
 ## Refreshing the game data (after a patch)
 
