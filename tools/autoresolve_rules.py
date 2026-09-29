@@ -9,6 +9,7 @@ These rules aim at "anyone against <back-line class>", applied in every auto-res
 
 The values are a first guess; the Battle Logger's auto-resolve entries are what they get tuned against.
 """
+import json
 import os
 import packwrite
 import gamever
@@ -18,11 +19,12 @@ from decided import coerce
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.environ.get("CBP_AR_OUT", os.path.join(os.path.dirname(HERE), "build", "cbp_autoresolve_test.pack"))
 GROUP = "cbp_protect_back_line"
-RULES = {            # class kept at the back: added to the enemy's kill rate against it
-    "art_fld": -0.70,
-    "inf_mis": -0.35,
-    "cav_mis": -0.25,
-}
+# class kept at the back: added to the enemy's kill rate against it. autoresolve_rules.json (written by
+# autoresolve_calibrate.py from players' battle logs) replaces these starting guesses once there is enough data.
+RULES = {"art_fld": -0.70, "inf_mis": -0.35, "cav_mis": -0.25}
+_json = os.path.join(os.path.dirname(os.path.abspath(__file__)), "autoresolve_rules.json")
+if os.path.exists(_json):
+    RULES = json.load(open(_json))["rules"]
 
 
 def main():
