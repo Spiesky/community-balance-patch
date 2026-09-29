@@ -16,6 +16,7 @@ installed game into `vanilla_db/` (not in git, see below).
     python3 sense_check.py             # does the patch make sense: sizes, directions, limits, roster order, fairness
     python3 grind_check.py             # elites against chaff: kills per model lost, vanilla and patched
     python3 gunpowder.py               # the units the gunpowder rule covers
+    python3 autoresolve_rules.py       # fairer auto-resolve test pack: back-line units take losses more slowly
     python3 rebalance_verify.py        # equal-gold duels, vanilla vs patched
     python3 rebalance_changelog.py     # -> reports/changelog.md, the player-facing list
     python3 rebalance_ladder_view.py   # -> reports/ladder.md, every roster in ladder order
