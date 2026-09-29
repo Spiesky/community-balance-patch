@@ -121,12 +121,16 @@ footer { margin-top: 22px; color: var(--muted); font-size: .92rem; text-align: c
     var out = [], cur = null;
     text.split(/\r?\n/).forEach(function (line) {
       line = line.trim();
-      if (line.indexOf("#battle;") === 0) {
+      if (line.indexOf("#battle;") === 0 || line.indexOf("#autoresolve;") === 0) {
         var mods = (line.match(/mods=([^;]*)/) || [])[1] || "unknown";
-        cur = { head: line, mods: mods, units: [], lines: [line] };
+        cur = { head: line, mods: mods, units: [], lines: [line], auto: line.indexOf("#autoresolve;") === 0 };
       } else if (cur && line.indexOf("u;") === 0) {
         var f = line.split(";");
         if (f.length >= 10) cur.units.push({ key: f[4], men: +f[5], alive: +f[6], kills: +f[7], routing: f[8] === "1", player: f[3] === "1" });
+        cur.lines.push(line);
+      } else if (cur && line.indexOf("a;") === 0) {
+        var g = line.split(";");                 // auto-resolve: strength in percent before and after
+        if (g.length >= 6) cur.units.push({ key: g[3], men: +g[4], alive: +g[5], kills: null, player: g[2] === "1" });
         cur.lines.push(line);
       } else if (cur && line === "#end") {
         cur.lines.push(line); out.push(cur); cur = null;
@@ -148,11 +152,12 @@ footer { margin-top: 22px; color: var(--muted); font-size: .92rem; text-align: c
     var patched = battles.filter(function (b) { return b.mods.indexOf("community_balance_patch.pack") >= 0; }).length;
     var per = {};
     battles.forEach(function (b) { b.units.forEach(function (u) {
-      var s = per[u.key] || (per[u.key] = { n: 0, men: 0, lost: 0, kills: 0 });
-      s.n++; s.men += u.men; s.lost += Math.max(0, u.men - u.alive); s.kills += u.kills;
+      var s = per[u.key] || (per[u.key] = { n: 0, men: 0, lost: 0, kills: 0, klost: 0 });
+      s.n++; s.men += u.men; s.lost += Math.max(0, u.men - u.alive);
+      if (u.kills !== null) { s.kills += u.kills; s.klost += Math.max(0, u.men - u.alive); }
     }); });
     var stats = document.getElementById("stats"); stats.innerHTML = "";
-    [[battles.length, "battles"], [patched, "with the patch"], [battles.length - patched, "vanilla"], [Object.keys(per).length, "units"]].forEach(function (s) {
+    [[battles.filter(function (b) { return !b.auto; }).length, "fought"], [battles.filter(function (b) { return b.auto; }).length, "auto-resolved"], [patched, "with the patch"], [Object.keys(per).length, "units"]].forEach(function (s) {
       var d = el("div", undefined, "stat"); d.appendChild(el("b", String(s[0]))); d.appendChild(el("small", s[1])); stats.appendChild(d);
     });
     var t = document.getElementById("units"); t.innerHTML = "";
@@ -162,7 +167,7 @@ footer { margin-top: 22px; color: var(--muted); font-size: .92rem; text-align: c
       r.appendChild(el("td", k.replace(/^wh\d?_(main|dlc\d+|pro\d+|twa\d+)_/, "")));
       r.appendChild(el("td", String(s.n), "num"));
       r.appendChild(el("td", Math.round(100 * s.lost / Math.max(1, s.men)) + "%", "num"));
-      r.appendChild(el("td", (s.kills / Math.max(1, s.lost)).toFixed(1), "num"));
+      r.appendChild(el("td", s.klost || s.kills ? (s.kills / Math.max(1, s.klost)).toFixed(1) : "-", "num"));
       t.appendChild(r);
     });
     var mods = {}; battles.forEach(function (b) { b.mods.split("|").forEach(function (m) { if (m) mods[m] = 1; }); });
