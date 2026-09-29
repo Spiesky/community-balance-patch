@@ -28,6 +28,20 @@ See [HOW_DECISIONS_ARE_MADE.md](docs/HOW_DECISIONS_ARE_MADE.md). In short:
 |---|---|---|
 | Blood Knights | open for feedback | [units/blood_knights.md](units/blood_knights.md) |
 
+## What's in here
+
+| folder | what |
+|---|---|
+| `units/` | one page per unit under review, with the proposal and the open questions |
+| `reports/changelog.md` | every change in the current draft, one line per unit, in plain words |
+| `reports/ladder.md` | every faction's roster in order after the changes |
+| `reports/proposals.md` | every change with before and after numbers and the reason |
+| `docs/METHOD.md` | how units are measured and valued |
+| `docs/COMMUNITY_RESEARCH.md` | what the community has said about balance, and how the draft compares |
+| `docs/CAVALRY_STUDY.md` | the cavalry study behind the cavalry targets |
+| `docs/TOOLS.md` | how to run the tools and build the pack |
+| `tools/` | the combat model, the solver and the pack builder |
+
 ## Status
 
-Pre-release. The first build exists but has not been tested in a campaign yet.
+Pre-release. The first draft changes 481 units and is built for the current patch, but it has not been tested in game yet. Units added in the latest updates stay vanilla until they're reviewed.
