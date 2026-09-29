@@ -1,0 +1,52 @@
+name: Test report
+description: Report how a unit performed in your battles
+title: "[Test] <unit> vs <opponent>"
+labels: ["test-report"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Mod version
+      description: From the Workshop page or the mod's changelog. Write "vanilla" if you tested without the mod.
+    validations:
+      required: true
+  - type: input
+    id: unit
+    attributes:
+      label: Unit tested
+    validations:
+      required: true
+  - type: input
+    id: opponent
+    attributes:
+      label: What it fought
+      description: e.g. "Grail Knights, equal gold", or "Chaos Warriors x2".
+    validations:
+      required: true
+  - type: dropdown
+    id: setting
+    attributes:
+      label: Battle type
+      options:
+        - Custom battle, unit vs unit
+        - Custom battle, full armies
+        - Campaign battle
+        - Multiplayer
+    validations:
+      required: true
+  - type: input
+    id: settings
+    attributes:
+      label: Unit size and difficulty
+      description: e.g. "Ultra, Legendary"
+  - type: textarea
+    id: result
+    attributes:
+      label: Result
+      description: Who won, how much was left, how many tries. Several runs are better than one.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes, replays, screenshots
