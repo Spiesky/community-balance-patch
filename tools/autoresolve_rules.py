@@ -27,7 +27,8 @@ if os.path.exists(_json):
     RULES = json.load(open(_json))["rules"]
 
 
-def main():
+def entries():
+    """the auto-resolve rows as pack entries; build_rebalance.py puts them in the patch itself"""
     targets, mods, lookups = [], [], []
     for n, (cls, value) in enumerate(sorted(RULES.items())):
         key = "cbp_all_v_" + cls
@@ -44,9 +45,14 @@ def main():
     for table, rows in (("autoresolver_modifier_group_keys", keys), ("autoresolver_modifier_targets", targets),
                         ("autoresolver_modifier_group_to_modifiers", mods), ("autoresolver_modifier_group_lookups", lookups)):
         entries.append(("db/%s_tables/!cbp_autoresolve" % table, packwrite.build_db(table + "_tables", gamever.ver(table), rows)))
+    return entries, (len(targets), len(mods), len(lookups))
+
+
+def main():
+    e, (t, m, l) = entries()
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    open(OUT, "wb").write(packwrite.build_pack(entries))
-    print("written: %s  %d bytes; %d targets, %d modifiers, %d battle types" % (OUT, os.path.getsize(OUT), len(targets), len(mods), len(lookups)))
+    open(OUT, "wb").write(packwrite.build_pack(e))
+    print("written: %s  %d bytes; %d targets, %d modifiers, %d battle types" % (OUT, os.path.getsize(OUT), t, m, l))
 
 
 if __name__ == "__main__":
