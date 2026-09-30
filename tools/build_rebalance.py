@@ -191,6 +191,8 @@ def main():
         entries.append(("db/missile_weapons_tables/!community_balance_patch", packwrite.build_db("missile_weapons_tables", gamever.ver("missile_weapons"), missiles)))
     if junctions:
         entries.append(("db/unit_missile_weapon_junctions_tables/!community_balance_patch", packwrite.build_db("unit_missile_weapon_junctions_tables", gamever.ver("unit_missile_weapon_junctions"), junctions)))
+    import autoresolve_rules                   # fairer auto-resolve ships in the patch
+    entries += autoresolve_rules.entries()[0]
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     open(OUT, "wb").write(packwrite.build_pack(entries))
     print("written: %s  %d bytes" % (OUT, os.path.getsize(OUT)))

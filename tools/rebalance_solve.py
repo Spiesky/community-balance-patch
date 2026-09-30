@@ -598,11 +598,39 @@ def main():
     # the beta: every proposal is published, but only the design rules go into the pack; the rest waits for players
     import copy
     beta = copy.deepcopy(props)
+    by_name = {}
+    for o in beta:
+        by_name.setdefault(o["name"], []).append(o)
+    def elite_infantry(o):
+        """beta theme 2: elite infantry worth its price (the complaint the community and CA agree on)"""
+        if o["action"] != "lore" or o["caste"] != "melee_infantry":
+            return False
+        if o["note"].startswith(("elite:", "champion:")):
+            return True
+        b = base_of(o, by_name)
+        return bool(b) and b is not o and b["note"].startswith(("elite:", "champion:"))
     for o in beta:
         o.pop("gun", None)
-        if not o.get("elite"):
+        if elite_infantry(o):
+            o["theme"] = "elite infantry"
+        elif not o.get("elite"):
             vanilla_prop(o, "proposal only (not in the beta): " + o["note"] if o["action"] != "none" else o["note"])
-    print("beta: gunpowder rule applied:", apply_gunpowder(beta), "| elites:", sum(1 for o in beta if o.get("elite")))
+    # a themed change can make an untouched roster mate the dearer-but-weaker one; take that mate's draft change too
+    # (the full draft is consistent), and only if the draft has none, let the guard revert the themed change
+    full = {o["key"]: o for o in props}
+    by_key = {o["key"]: o for o in beta}
+    before = inversions(beta, False)
+    while True:
+        adopt = {k for pair in inversions(beta, True) if pair not in before for k in pair
+                 if by_key[k]["action"] == "none" and full[k]["action"] == "lore"}
+        if not adopt:
+            break
+        for k in adopt:
+            by_key[k].update(copy.deepcopy(full[k]), theme="elite infantry (roster fit)")
+    print("beta: roster mates taken from the draft:", sorted(o["name"] for o in beta if o.get("theme") == "elite infantry (roster fit)"))
+    print("beta: gunpowder rule applied:", apply_gunpowder(beta), "| elites:", sum(1 for o in beta if o.get("elite")),
+          "| elite infantry:", sum(1 for o in beta if o.get("theme") == "elite infantry"))
+    print("beta: reverted by the guard:", guard(beta))
     json.dump(dict(weights=S["weights"], tolerance=TOLERANCE, cap=CAP, units=beta), open(BETA_JSON, "w"), indent=1)
     print("proposals:", {k: len(v) for k, v in by_action.items()})
     print("wrote", OUT_MD, "and", OUT_JSON)
