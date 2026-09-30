@@ -12,6 +12,7 @@ local LOG_FILE = "cbp_battle_log.txt"
 local VERSION = "1"
 local SHARE_PAGE = "https://spiesky.github.io/community-balance-patch/"
 
+local DEBUG = false          -- test builds: trace every step as '#debug' lines (the analysis tools ignore them)
 local autoresolve_clicked = false
 local cache = nil
 
@@ -160,22 +161,35 @@ local function write_result()
 	end
 end
 
+local function trace(text)
+	if DEBUG then
+		pcall(note, "#debug;autoresolve;" .. (safe(os.date, "%H:%M:%S") or "?") .. ";" .. text)
+	end
+end
+
 function cbp_autoresolve_logger()
+	trace("started")
 	if safe(function() return cm:is_multiplayer() end) ~= false then
 		return
 	end
 	-- the click only sets a flag: no game reads inside a UI event
 	core:add_listener("cbp_autoresolve_click", "ComponentLClickUp",
 		function(context) return context and (context.string == "button_autoresolve" or context.string == "button_attack") end,
-		function(context) autoresolve_clicked = (context.string == "button_autoresolve") end, true)
+		function(context)
+			autoresolve_clicked = (context.string == "button_autoresolve")
+			trace("click " .. tostring(context.string))
+		end, true)
 	-- before the battle: a snapshot of every army involved, but only for the player's own battles
 	core:add_listener("cbp_autoresolve_pending", "PendingBattle",
 		function()
-			return safe(player_involved) == true
+			local involved = safe(player_involved)
+			if involved then trace("PendingBattle, player involved") end
+			return involved == true
 		end,
 		function()
 			autoresolve_clicked = false
 			cache = guarded("snapshot", take_snapshot)
+			trace("snapshot " .. tostring(cache and #cache or "nil") .. " units")
 		end, true)
 	-- a save made at the pre-battle screen: the game does not fire PendingBattle when it loads, so take the snapshot once
 	-- the loading screen is gone (the same check CA's own battle cache makes)
@@ -186,6 +200,7 @@ function cbp_autoresolve_logger()
 				if pb:is_active() and not pb:has_been_fought() then
 					if player_involved() then
 						cache = take_snapshot()
+						trace("snapshot after load " .. tostring(cache and #cache or "nil") .. " units")
 					end
 				end
 			end)
@@ -193,6 +208,7 @@ function cbp_autoresolve_logger()
 	-- after the battle: log it if the player chose auto-resolve
 	core:add_listener("cbp_autoresolve_completed", "BattleCompleted", true,
 		function()
+			trace("BattleCompleted clicked=" .. tostring(autoresolve_clicked) .. " snapshot=" .. tostring(cache and #cache or "nil"))
 			if autoresolve_clicked and cache and #cache > 0 then
 				guarded("write", write_result)
 			elseif autoresolve_clicked then
