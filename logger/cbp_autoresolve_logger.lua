@@ -164,6 +164,18 @@ function cbp_autoresolve_logger()
 			autoresolve_clicked = false
 			cache = guarded("snapshot", take_snapshot)
 		end, true)
+	-- a save made at the pre-battle screen: the game does not fire PendingBattle when it loads, so take the snapshot once
+	-- the loading screen is gone (the same check CA's own battle cache makes)
+	core:add_listener("cbp_autoresolve_loaded", "LoadingScreenDismissed", true,
+		function()
+			local pb = cm:model():pending_battle()
+			if pb:is_active() and not pb:has_been_fought() then
+				local function human(c) return c and not c:is_null_interface() and c:faction():is_human() end
+				if (pb:has_attacker() and human(pb:attacker())) or (pb:has_defender() and human(pb:defender())) then
+					cache = guarded("snapshot after load", take_snapshot)
+				end
+			end
+		end, false)
 	-- after the battle: log it if the player chose auto-resolve
 	core:add_listener("cbp_autoresolve_completed", "BattleCompleted", true,
 		function()
