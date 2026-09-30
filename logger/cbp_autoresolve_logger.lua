@@ -15,6 +15,23 @@ local SHARE_PAGE = "https://spiesky.github.io/community-balance-patch/"
 local autoresolve_clicked = false
 local cache = nil
 
+local function note(text)
+	local file = io.open(LOG_FILE, "a")
+	if file then
+		file:write(text .. "\n")
+		file:close()
+	end
+end
+
+-- a failure is never allowed to touch the campaign, but it is written down instead of swallowed, so it can be fixed
+local function guarded(where, f, ...)
+	local ok, err = pcall(f, ...)
+	if not ok then
+		pcall(note, "#error;v" .. VERSION .. ";autoresolve " .. where .. ";" .. tostring(err))
+	end
+	return ok and err or nil
+end
+
 local function safe(f, ...)
 	local ok, result = pcall(f, ...)
 	if ok then
@@ -145,13 +162,15 @@ function cbp_autoresolve_logger()
 		end,
 		function()
 			autoresolve_clicked = false
-			cache = safe(take_snapshot)
+			cache = guarded("snapshot", take_snapshot)
 		end, true)
 	-- after the battle: log it if the player chose auto-resolve
 	core:add_listener("cbp_autoresolve_completed", "BattleCompleted", true,
 		function()
 			if autoresolve_clicked and cache then
-				safe(write_result)
+				guarded("write", write_result)
+			elseif autoresolve_clicked then
+				pcall(note, "#error;v" .. VERSION .. ";autoresolve;clicked but no snapshot from the PendingBattle event")
 			end
 			autoresolve_clicked = false
 			cache = nil
