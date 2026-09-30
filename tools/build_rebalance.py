@@ -35,6 +35,7 @@ from decided import STATS, coerce
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.environ.get("CBP_OUT", os.path.join(os.path.dirname(HERE), "build", "community_balance_patch.pack"))
 PROPOSALS = os.environ.get("CBP_PROPOSALS") or os.path.join(HERE, "_rebalance.json")
+COMMUNITY = os.environ.get("CBP_COMMUNITY") == "1"   # apply the community's own list (community.py) on top
 PREFIX = "gr_"                     # the great rebalance's own keys
 
 
@@ -182,6 +183,19 @@ def main():
         main_rows.append(coerce("main_units", mu))
         counts["units"] += 1
 
+    if COMMUNITY:                              # the community's own list on top (community.py)
+        import community
+        import unit_model as UM
+        out = dict(land_units={r["key"]: r for r in land}, main_units={r["unit"]: r for r in main_rows},
+                   melee_weapons={r["key"]: r for r in weapons}, projectiles={r["key"]: r for r in projectiles},
+                   missile_weapons={r["key"]: r for r in missiles})
+        skip = {o["key"]: "lore elite, set by the patch's own design" for o in props if o.get("elite")}
+        clog = community.apply(out, V, coerce, UM.name, UM.faction, UM.recruitable(), skip)
+        land, main_rows = list(out["land_units"].values()), list(out["main_units"].values())
+        weapons, projectiles, missiles = list(out["melee_weapons"].values()), list(out["projectiles"].values()), list(out["missile_weapons"].values())
+        entities = list(out.get("battle_entities", {}).values())
+        print("   community list: %d changes, %d land units, %d entities" % (len(clog), len(land), len(entities)))
+        json.dump([[l, k, c] for l, k, c in clog], open(os.path.join(os.path.dirname(OUT), "community_log.json"), "w"), indent=0)
     entries = [("db/land_units_tables/!community_balance_patch", packwrite.build_db("land_units_tables", gamever.ver("land_units"), land)),
                ("db/main_units_tables/!community_balance_patch", packwrite.build_db("main_units_tables", gamever.ver("main_units"), main_rows))]
     if weapons:
@@ -191,6 +205,8 @@ def main():
         entries.append(("db/missile_weapons_tables/!community_balance_patch", packwrite.build_db("missile_weapons_tables", gamever.ver("missile_weapons"), missiles)))
     if junctions:
         entries.append(("db/unit_missile_weapon_junctions_tables/!community_balance_patch", packwrite.build_db("unit_missile_weapon_junctions_tables", gamever.ver("unit_missile_weapon_junctions"), junctions)))
+    if COMMUNITY and entities:
+        entries.append(("db/battle_entities_tables/!community_balance_patch", packwrite.build_db("battle_entities_tables", gamever.ver("battle_entities"), entities)))
     import autoresolve_rules                   # fairer auto-resolve ships in the patch
     entries += autoresolve_rules.entries()[0]
     os.makedirs(os.path.dirname(OUT), exist_ok=True)

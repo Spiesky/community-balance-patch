@@ -39,6 +39,7 @@ See [HOW_DECISIONS_ARE_MADE.md](docs/HOW_DECISIONS_ARE_MADE.md). In short:
 | `reports/changelog.md` | every change in the current draft, one line per unit, in plain words |
 | `reports/ladder.md` | every faction's roster in order after the changes |
 | `reports/proposals.md` | every change with before and after numbers and the reason |
+| `docs/COMMUNITY_LIST.md` | the community's peer-reviewed balance list, what of it is in the patch and what CA already did |
 | `docs/METHOD.md` | how units are measured and valued |
 | `docs/COMMUNITY_RESEARCH.md` | what the community has said about balance, and how the draft compares |
 | `docs/CAVALRY_STUDY.md` | the cavalry study behind the cavalry targets |

@@ -609,9 +609,14 @@ def main():
             return True
         b = base_of(o, by_name)
         return bool(b) and b is not o and b["note"].startswith(("elite:", "champion:"))
+    import community                           # a unit on the community's list takes their numbers, not the model's
+    named = {k for _, _, _, keys in community.resolve([o["key"] for o in beta], UM.name, UM.faction) for k in keys}
     for o in beta:
         o.pop("gun", None)
-        if elite_infantry(o):
+        if o["key"] in named and not o.get("elite"):
+            vanilla_prop(o, "community list (community.py): " + o["note"] if o["action"] != "none" else o["note"])
+            o["community"] = True
+        elif elite_infantry(o):
             o["theme"] = "elite infantry"
         elif not o.get("elite"):
             vanilla_prop(o, "proposal only (not in the beta): " + o["note"] if o["action"] != "none" else o["note"])
@@ -622,7 +627,7 @@ def main():
     before = inversions(beta, False)
     while True:
         adopt = {k for pair in inversions(beta, True) if pair not in before for k in pair
-                 if by_key[k]["action"] == "none" and full[k]["action"] == "lore"}
+                 if by_key[k]["action"] == "none" and full[k]["action"] == "lore" and not by_key[k].get("community")}
         if not adopt:
             break
         for k in adopt:

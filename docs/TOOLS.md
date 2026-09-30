@@ -15,6 +15,8 @@ installed game into `vanilla_db/` (not in git, see below).
     python3 test_rebalance.py          # the invariants as tests; run after any change
     python3 sense_check.py             # does the patch make sense: sizes, directions, limits, roster order, fairness
     python3 grind_check.py             # elites against chaff: kills per model lost, vanilla and patched
+    CBP_COMMUNITY=1 python3 build_rebalance.py   # the same pack with the community's own list on top (community.py)
+    python3 community_check.py         # every unit changes exactly as the community list says, nothing else moves
     python3 gunpowder.py               # the units the gunpowder rule covers
     python3 autoresolve_calibrate.py logs/*.txt --write   # learn the auto-resolve rules from fought vs auto-resolved logs
     python3 autoresolve_rules.py       # fairer auto-resolve pack from those rules (starting guesses until there is data)
