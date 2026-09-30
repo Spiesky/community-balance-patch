@@ -74,6 +74,10 @@ See [HOW_DECISIONS_ARE_MADE.md](docs/HOW_DECISIONS_ARE_MADE.md). In short:
 | Blood Knights | in the patch, tests wanted | [units/blood_knights.md](units/blood_knights.md) |
 | Grail Knights and Grail Guardians | in the patch, tests wanted | [units/grail_knights.md](units/grail_knights.md) |
 | Cheap archers against armour | open question, test first | [units/tier1_archers.md](units/tier1_archers.md) |
+| Character outliers (Nagash, Dechala, XP traits) | open proposal, round 1 | [proposals/character_outliers.md](proposals/character_outliers.md) |
+| Auto-resolve: retreats, spells, hidden modifiers | open proposal, round 1 | [proposals/autoresolve_retreat_and_spells.md](proposals/autoresolve_retreat_and_spells.md) |
+| Skipped archetypes (light cavalry, fliers, dogs, chariots, siblings) | open proposal, round 1 | [proposals/archetype_pass.md](proposals/archetype_pass.md) |
+| Magic (cast times, Lore of Death) | open proposal, round 1 | [proposals/magic_pass.md](proposals/magic_pass.md) |
 
 ## What's in here
 
@@ -82,6 +86,7 @@ See [HOW_DECISIONS_ARE_MADE.md](docs/HOW_DECISIONS_ARE_MADE.md). In short:
 | `reports/beta_changelog.md` | **what the Workshop pack changes**, one line per unit, generated from the pack's data |
 | `CHANGELOG.md` | release notes, one entry per Workshop upload |
 | `units/` | one page per unit under review: the test wanted, the idea, the numbers |
+| `proposals/` | round proposals that cover more than one unit: characters, auto-resolve, archetypes, magic |
 | `docs/TESTING.md` | how to run a test that counts |
 | `docs/HOW_DECISIONS_ARE_MADE.md` | who decides, and how a change gets in |
 | `docs/COMMUNITY_LIST.md` | the community's peer-reviewed balance list: what of it is in the patch and what CA already did |
