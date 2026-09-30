@@ -212,10 +212,24 @@ ENTITIES = [
 MOUNT_ACCEL = (416, "Bretonnian Warhorses, Great Stags, Stags", re.compile(r"^wh_main_brt_mnt_.*warhorse|^wh_dlc05_wef_mnt_(great_)?stag"), 7.0)
 
 
+# Campaign review (reports/WH3 balance patch research.md, item 5): the list is written by multiplayer players, and CA's 8.1
+# drew campaign anger for copying its buffs to units campaign players already find too strong. Where campaign sources
+# agree a unit already dominates armies, its buff waits for battle logs.
+HELD = {
+    625: "Arachnarok Spider: named among the dominant campaign monsters",
+    730: "Ancient Stegadon: Stegadons are named among the dominant campaign monsters",
+    778: "Ironblaster: the most-cited dominant campaign unit (\"may be the most powerful unit in the game\")",
+    836: "Helstorm Rocket Battery: rockets are named among the dominant campaign artillery",
+    939: "Treeman: named among the dominant campaign monsters",
+}
+
+
 def resolve(units, name_of, faction_of):
-    """entry -> the unit keys it names (full-name match, faction filter where the name is shared)"""
+    """entry -> the unit keys it names (full-name match, faction filter where the name is shared); held entries skipped"""
     out = []
     for line, pat, ch in UNITS:
+        if line in HELD:
+            continue
         rx = re.compile(r"^(%s)$" % pat)
         keys = [k for k in units if rx.match(name_of(k)) and (not ch.get("_faction") or faction_of(k) == ch["_faction"])]
         out.append((line, pat, ch, keys))

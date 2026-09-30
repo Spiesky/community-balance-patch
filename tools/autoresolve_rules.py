@@ -19,6 +19,7 @@ from decided import coerce
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.environ.get("CBP_AR_OUT", os.path.join(os.path.dirname(HERE), "build", "cbp_autoresolve_test.pack"))
 GROUP = "cbp_protect_back_line"
+BUG_ROW = "432943812"             # the second missile row of wh_moderate_kps_multiplier_bonus
 # class kept at the back: added to the enemy's kill rate against it. autoresolve_rules.json (written by
 # autoresolve_calibrate.py from players' battle logs) replaces these starting guesses once there is enough data.
 RULES = {"art_fld": -0.70, "inf_mis": -0.35, "cav_mis": -0.25}
@@ -40,6 +41,11 @@ def entries():
         lookups.append(coerce("autoresolver_modifier_group_lookups", dict(
             id=str(1904120000 + n), battle_type=bt, modifier_group_applied=GROUP, modifier_value_multiplier_mechanic="none",
             player_type="any")))
+    # CA's bug, still in 9.0: wh_moderate_kps_multiplier_bonus has two identical missile rows and no melee row (its
+    # sibling wh_spell_moderate_kps_multiplier_bonus has one of each). One of the two becomes the melee row.
+    fix = V.index("autoresolver_modifier_group_to_modifiers", "id").get(BUG_ROW)
+    if fix and fix["group"] == "wh_moderate_kps_multiplier_bonus" and fix["modifier_bonus"] == "unit_missile_kps_multiplier":
+        mods.append(coerce("autoresolver_modifier_group_to_modifiers", dict(fix, modifier_bonus="unit_melee_kps_multiplier")))
     keys = [coerce("autoresolver_modifier_group_keys", dict(group_key=GROUP))]
     entries = []
     for table, rows in (("autoresolver_modifier_group_keys", keys), ("autoresolver_modifier_targets", targets),

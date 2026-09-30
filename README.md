@@ -30,6 +30,7 @@ See [HOW_DECISIONS_ARE_MADE.md](docs/HOW_DECISIONS_ARE_MADE.md). In short:
 | unit | status | page |
 |---|---|---|
 | Blood Knights | in the patch, open for feedback | [units/blood_knights.md](units/blood_knights.md) |
+| Cheap archers vs armour | open proposal, round 1 | [units/tier1_archers.md](units/tier1_archers.md) |
 
 ## What's in here
 
@@ -40,6 +41,7 @@ See [HOW_DECISIONS_ARE_MADE.md](docs/HOW_DECISIONS_ARE_MADE.md). In short:
 | `reports/ladder.md` | every faction's roster in order after the changes |
 | `reports/proposals.md` | every change with before and after numbers and the reason |
 | `docs/COMMUNITY_LIST.md` | the community's peer-reviewed balance list, what of it is in the patch and what CA already did |
+| `docs/AUTORESOLVE.md` | how auto-resolve works, what the patch changes, and the test that decides the back-line rule |
 | `docs/METHOD.md` | how units are measured and valued |
 | `docs/COMMUNITY_RESEARCH.md` | what the community has said about balance, and how the draft compares |
 | `docs/CAVALRY_STUDY.md` | the cavalry study behind the cavalry targets |

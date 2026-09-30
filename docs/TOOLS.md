@@ -3,6 +3,16 @@
 Everything is Python 3 (plus numpy) and runs from `tools/`. The data is the game's own database, exported from the
 installed game into `vanilla_db/` (not in git, see below).
 
+## Patch day
+
+After a CA update, one command re-reads the game's data from the installed packs and rebuilds and checks the beta:
+
+    tools/patch_day.sh
+
+It needs Python with `zstandard` (CA compresses its packs); the script uses `~/Tools/venvs/wh3/bin/python`, or set
+`CBP_PYTHON`. `refresh_vanilla.py` alone just re-reads the data and lists every table CA changed. Then drop anything CA
+fixed itself from `community.py`, and check the release notes for units to re-test.
+
 ## The pipeline
 
     cd tools

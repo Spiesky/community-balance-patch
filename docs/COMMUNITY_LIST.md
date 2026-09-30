@@ -99,7 +99,6 @@ checks that every unit changes exactly as the list says and nothing else moves.
 | 622 | Black Orcs (Great Weapons) | +2 MA, +2 AP WS, +40 mass |
 | 623 | Black Orcs | +2 MA, +40 mass |
 | 624 | Krimson Killerz (Black Orcs) | +2 MA, +2 BvI |
-| 625 | Arachnarok Spider, Arachnarok Spider (Flinger) | -50 gold, +15 % missile resistance |
 | 626 | Forest Goblin Spider Riders | +1 base WS, +1 AP WS, +3 CB |
 | 627 | Forest Goblin Spider Rider Archers | +15 range, +1 missile base dmg, +1 missile AP dmg, +360 HP (unit) |
 | 630 | Ruglud's Armoured Orcs | +50 gold, +4 accuracy |
@@ -129,9 +128,7 @@ checks that every unit changes exactly as the list says and nothing else moves.
 | 717 | Temple Guard | +2 MA, +1 base WS, +2 AP WS, +30 mass |
 | 718 | Saurus Warriors, Saurus Warriors (Shields) | +4 CB |
 | 719 | Saurus Spears, Saurus Spears (Shields) | +2 base WS, +1 AP WS |
-| 730 | Ancient Stegadon | ammo 120 |
 | 733 | Feral Cold Ones | +4 speed |
-| 778 | Ironblaster | -100 gold |
 | 779 | Yhetees | +8 speed, +2 MA |
 | 788 | Plague Monk Censer Bearers | +3 MA |
 | 789 | Death Runners | +2 BvI |
@@ -141,7 +138,6 @@ checks that every unit changes exactly as the list says and nothing else moves.
 | 833 | Handgunners | -25 gold |
 | 834 | War Wagons (Mortars) | -50 gold |
 | 835 | Crossbowmen | -25 gold |
-| 836 | Helstorm Rocket Battery | -50 gold |
 | 837 | Steam Tank (Volley Gun) | +9 missile base dmg, +28 missile AP dmg |
 | 838 | Demigryph Knights | +10 CB, +2 MA |
 | 840 | The White Wolves (Huntsmen) | +12 HP per model |
@@ -167,10 +163,22 @@ checks that every unit changes exactly as the list says and nothing else moves.
 | 933 | Hawk Riders | +5 CB, +5 LD |
 | 934 | Bladesingers | +2 CB, +2 AP WS |
 | 935 | Deepwood Scouts | calibration area 3.4 |
-| 939 | Treeman | -100 gold |
 | 941 | Winterheart Guard (Eternal Guard – Shields) | +20 armour |
 | 942 | Eternal Guard, Eternal Guard (Shields) | +20 mass |
 | 943 | Enigmas of Ghyran (Zoats) | -50 gold |
+
+## Held after a campaign review
+
+The list is written by multiplayer players, and CA's 8.1 drew campaign anger for copying its buffs to units campaign
+players already find too strong. These entries wait until battle logs show they are needed:
+
+| line | why it waits |
+|---|---|
+| 625 | Arachnarok Spider: named among the dominant campaign monsters |
+| 730 | Ancient Stegadon: Stegadons are named among the dominant campaign monsters |
+| 778 | Ironblaster: the most-cited dominant campaign unit ("may be the most powerful unit in the game") |
+| 836 | Helstorm Rocket Battery: rockets are named among the dominant campaign artillery |
+| 939 | Treeman: named among the dominant campaign monsters |
 
 ## Not in yet
 
@@ -180,7 +188,7 @@ checks that every unit changes exactly as the list says and nothing else moves.
   durations, potions, scrolls, Nurgle army abilities). Next pass after the lords.
 - **Unit caps** are multiplayer-only and not part of a campaign mod.
 - **Animation and hitbox fixes** (Daemon Princes, Miao Ying, Mournguls, entity shapes) need animation work, not tables.
-- Taken out on purpose: **Grail Guardians** (the patch's own lore elite), **Bloodwrack Shrine +190 WS** (the list
+- Taken out on purpose: **Grail Guardians** (the patch's own lore elite), **Teutogen Guard and Putrid Blightkings** (new in 9.0, look bugged or mispriced; wait for CA's balance patch), **Bloodwrack Shrine +190 WS** (the list
   does not say base or AP), **Druzhina ammunition** (no unit by that name in the game), **Blessed Field Trebuchet
   explosion damage** and **Poisoned Wind Mortar radius** (explosion tables, next pass), **Reaper/Eagle Claw
   multi-shot ammo** (alternate ammunition, next pass), **War Wagon Mortars fire arc** (line 379: the wagon is a chariot
