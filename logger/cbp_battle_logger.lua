@@ -53,7 +53,16 @@ local function write_battle()
 	for a = 1, alliances:count() do
 		local armies = alliances:item(a):armies()
 		for b = 1, armies:count() do
-			local units = armies:item(b):units()
+			local army = armies:item(b)
+			-- the army's own units, then any reinforcement groups that arrived during the battle
+			local groups = { army:units() }
+			for r = 1, safe(function() return army:num_reinforcement_units() end) or 0 do
+				local extra = safe(function() return army:get_reinforcement_units(r) end)
+				if extra then
+					table.insert(groups, extra)
+				end
+			end
+			for _, units in ipairs(groups) do
 			for u = 1, units:count() do
 				local unit = units:item(u)
 				table.insert(lines, string.format("u;%d;%d;%s;%s;%s;%s;%s;%s;%s",
@@ -64,6 +73,7 @@ local function write_battle()
 					tostring(safe(function() return unit:number_of_enemies_killed() end) or "?"),
 					flag(safe(function() return unit:is_routing() end)),
 					flag(safe(function() return unit:is_shattered() end))))
+			end
 			end
 		end
 	end

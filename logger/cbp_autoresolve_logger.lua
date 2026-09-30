@@ -97,6 +97,23 @@ local function take_snapshot()
 	return units
 end
 
+-- is the player in this battle: as the main attacker or defender, or as a reinforcing army (cheap: runs for AI battles too)
+local function player_involved()
+	local pb = cm:model():pending_battle()
+	local function human(c) return c and not c:is_null_interface() and c:faction():is_human() end
+	if (pb:has_attacker() and human(pb:attacker())) or (pb:has_defender() and human(pb:defender())) then
+		return true
+	end
+	for _, list in ipairs({ safe(function() return pb:secondary_attackers() end), safe(function() return pb:secondary_defenders() end) }) do
+		for i = 0, list:num_items() - 1 do
+			if human(list:item_at(i)) then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 local function write_result()
 	local pb = cm:model():pending_battle()
 	local result = "?"
@@ -154,11 +171,7 @@ function cbp_autoresolve_logger()
 	-- before the battle: a snapshot of every army involved, but only for the player's own battles
 	core:add_listener("cbp_autoresolve_pending", "PendingBattle",
 		function()
-			return safe(function()
-				local pb = cm:model():pending_battle()
-				local function human(c) return c and not c:is_null_interface() and c:faction():is_human() end
-				return (pb:has_attacker() and human(pb:attacker())) or (pb:has_defender() and human(pb:defender()))
-			end) == true
+			return safe(player_involved) == true
 		end,
 		function()
 			autoresolve_clicked = false
@@ -171,8 +184,7 @@ function cbp_autoresolve_logger()
 			guarded("after load", function()
 				local pb = cm:model():pending_battle()
 				if pb:is_active() and not pb:has_been_fought() then
-					local function human(c) return c and not c:is_null_interface() and c:faction():is_human() end
-					if (pb:has_attacker() and human(pb:attacker())) or (pb:has_defender() and human(pb:defender())) then
+					if player_involved() then
 						cache = take_snapshot()
 					end
 				end
