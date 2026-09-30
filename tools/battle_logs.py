@@ -14,7 +14,7 @@ since those may change how units fight.
 import collections, sys
 
 # our own packs: a battle with nothing else loaded is "clean" data; anything else might change how units fight
-OURS = ("community_balance_patch", "cbp_", "!!!claude_skip_intros")
+OURS = ("community_balance_patch", "cbp_")
 
 
 def clean(mods):
