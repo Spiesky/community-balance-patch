@@ -36,6 +36,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.environ.get("CBP_OUT", os.path.join(os.path.dirname(HERE), "build", "community_balance_patch.pack"))
 PROPOSALS = os.environ.get("CBP_PROPOSALS") or os.path.join(HERE, "_rebalance.json")
 COMMUNITY = os.environ.get("CBP_COMMUNITY") == "1"   # apply the community's own list (community.py) on top
+YIELD_TO_BUGFIX = {"wh3_dlc25_dwf_inf_slayer_pirates", "wh3_dlc25_dwf_inf_slayer_pirates_ror"}   # its animation fix
 PREFIX = "gr_"                     # the great rebalance's own keys
 
 
@@ -196,6 +197,10 @@ def main():
         entities = list(out.get("battle_entities", {}).values())
         print("   community list: %d changes, %d land units, %d entities" % (len(clog), len(land), len(entities)))
         json.dump([[l, k, c] for l, k, c in clog], open(os.path.join(os.path.dirname(OUT), "community_log.json"), "w"), indent=0)
+    # rows the Community Bug Fix Mod also fixes go in a file that sorts after its "zzz_cbfm_*" files: with it installed its
+    # fix wins, without it ours applies (checked against its pack of 2026-09-27, Game v9 Batch 1)
+    yielded = [r for r in land if r["key"] in YIELD_TO_BUGFIX]
+    land = [r for r in land if r["key"] not in YIELD_TO_BUGFIX]
     entries = [("db/land_units_tables/!community_balance_patch", packwrite.build_db("land_units_tables", gamever.ver("land_units"), land)),
                ("db/main_units_tables/!community_balance_patch", packwrite.build_db("main_units_tables", gamever.ver("main_units"), main_rows))]
     if weapons:
@@ -205,6 +210,8 @@ def main():
         entries.append(("db/missile_weapons_tables/!community_balance_patch", packwrite.build_db("missile_weapons_tables", gamever.ver("missile_weapons"), missiles)))
     if junctions:
         entries.append(("db/unit_missile_weapon_junctions_tables/!community_balance_patch", packwrite.build_db("unit_missile_weapon_junctions_tables", gamever.ver("unit_missile_weapon_junctions"), junctions)))
+    if yielded:
+        entries.append(("db/land_units_tables/zzzz_community_balance_patch_after_bugfix", packwrite.build_db("land_units_tables", gamever.ver("land_units"), yielded)))
     if COMMUNITY and entities:
         entries.append(("db/battle_entities_tables/!community_balance_patch", packwrite.build_db("battle_entities_tables", gamever.ver("battle_entities"), entities)))
     import autoresolve_rules                   # fairer auto-resolve ships in the patch

@@ -48,9 +48,15 @@ body:
     id: proposal
     attributes:
       label: What would you change?
-      description: Numbers if you have them (price, models, stats, abilities). "I don't know, but it's off" is fine too.
+      description: Exact numbers if you have them (e.g. "+4 melee attack, -25 gold"). A suggestion needs exact numbers and a sponsor to go to a vote, but "I don't know, but it's off" is still worth posting; someone may pick it up.
   - type: textarea
     id: evidence
     attributes:
       label: Evidence
       description: Test results, replays, screenshots, lore sources, links.
+  - type: checkboxes
+    id: sponsor
+    attributes:
+      label: Sponsor
+      options:
+        - label: I'll build and test this myself if it wins the vote (see docs/HOW_DECISIONS_ARE_MADE.md)
