@@ -121,3 +121,6 @@ From the same reverse-engineering. Only the first and the fourth have been check
 - Spells and abilities count for very little (their auto-resolve buff is capped at 0.10).
 - Shock and melee cavalry get +50% melee kill rate (`wh_global_cavalry_melee_kps_multiplier_bonus`).
 - `ai_usage_group` sets both a unit's battle AI role and its auto-resolve protection, so changing one changes the other.
+
+Proposals for these, with exact numbers, are open for a vote in
+[proposals/autoresolve_retreat_and_spells.md](../proposals/autoresolve_retreat_and_spells.md).
