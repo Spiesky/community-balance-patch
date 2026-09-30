@@ -149,7 +149,7 @@ function cbp_autoresolve_logger()
 	end
 	-- the click only sets a flag: no game reads inside a UI event
 	core:add_listener("cbp_autoresolve_click", "ComponentLClickUp",
-		function(context) return context.string == "button_autoresolve" or context.string == "button_attack" end,
+		function(context) return context and (context.string == "button_autoresolve" or context.string == "button_attack") end,
 		function(context) autoresolve_clicked = (context.string == "button_autoresolve") end, true)
 	-- before the battle: a snapshot of every army involved, but only for the player's own battles
 	core:add_listener("cbp_autoresolve_pending", "PendingBattle",
@@ -168,18 +168,20 @@ function cbp_autoresolve_logger()
 	-- the loading screen is gone (the same check CA's own battle cache makes)
 	core:add_listener("cbp_autoresolve_loaded", "LoadingScreenDismissed", true,
 		function()
-			local pb = cm:model():pending_battle()
-			if pb:is_active() and not pb:has_been_fought() then
-				local function human(c) return c and not c:is_null_interface() and c:faction():is_human() end
-				if (pb:has_attacker() and human(pb:attacker())) or (pb:has_defender() and human(pb:defender())) then
-					cache = guarded("snapshot after load", take_snapshot)
+			guarded("after load", function()
+				local pb = cm:model():pending_battle()
+				if pb:is_active() and not pb:has_been_fought() then
+					local function human(c) return c and not c:is_null_interface() and c:faction():is_human() end
+					if (pb:has_attacker() and human(pb:attacker())) or (pb:has_defender() and human(pb:defender())) then
+						cache = take_snapshot()
+					end
 				end
-			end
+			end)
 		end, false)
 	-- after the battle: log it if the player chose auto-resolve
 	core:add_listener("cbp_autoresolve_completed", "BattleCompleted", true,
 		function()
-			if autoresolve_clicked and cache then
+			if autoresolve_clicked and cache and #cache > 0 then
 				guarded("write", write_result)
 			elseif autoresolve_clicked then
 				pcall(note, "#error;v" .. VERSION .. ";autoresolve;clicked but no snapshot from the PendingBattle event")
