@@ -1,10 +1,10 @@
 # The community's balance list in the patch
 
-The patch's first draft takes the multiplayer community's own peer-reviewed list and puts it in as written: their
-numbers, no model in between.
+The patch takes the multiplayer community's own peer-reviewed list and puts it in as written: their numbers, no model
+in between.
 
 **Source:** [Community sourced, peer-reviewed balance recommendations list (patch 7.1+)](https://community.creative-assembly.com/total-war/total-war-warhammer/forums/15-total-war-warhammer/threads/13577-community-sourced-peer-reviewed-balance-recommendations-list-patch-7-1),
-Total Tavern and Vermin League discords, 2 March 2026. The line numbers below point into that thread as we copied it.
+Total Tavern and Vermin League discords, 2 March 2026. The line numbers below point into that thread as I copied it.
 
 **What CA has done since.** 7.2, 8.0 and 9.0 had no numbered balance changes. Patch 8.1 (9 July 2026) adopted about
 60 of the list's recommendations almost word for word, most of the Norsca, Nurgle, Slaanesh and Tzeentch sections
@@ -15,11 +15,39 @@ Guardian). Those are already in the game and are left out here. The Sky Lantern 
 left out too.
 
 **How it sits with the rest of the patch.** A unit on this list takes the community's change and nothing from the
-patch's model. The lore elites (Blood Knights, Grail Knights, Grail Guardians, Swords of Chaos) keep the patch's own
-design, and the gunpowder rule still applies on top of a price change (Handgunners, Thunderers).
+patch's model: the list is peer-reviewed and has been played, the model's numbers have not. So for the elite infantry
+the list names (Chaos Warriors, Chosen, Temple Guard, Phoenix Guard, Black Guard, White Lions, Grave Guard, Infernal
+Guard, Hammerers, Black Orcs), the patch ships the list's +2 attack style of change, not the lore ladder's larger one;
+the ladder's numbers for them stay in `reports/changelog.md` as proposals, and its elite-infantry theme covers the
+elite infantry the list does not mention. The lore elites (Blood Knights, Grail Knights, Grail Guardians, Swords of
+Chaos) keep the patch's own design.
+
+**Regiments of renown and campaign twins follow their base unit.** The list was written unit by unit and mostly leaves
+regiments of renown out, so applying it to the letter leaves Keepers of the Flame behind the Phoenix Guard they are a
+better version of. The patch's rule everywhere else is that a regiment of renown moves with its base, so here too:
+where the list changes a unit and does not name its regiment of renown, the regiment takes the same changes to how it
+fights (not the price change, and not a remodel written for one unit). A campaign twin (the Grudge Settlers copies)
+is the same unit under another key and takes everything. `python3 tools/community.py` lists them as "follows ...".
+The other way round, a unit whose regiment of renown the list remodels (Swordmasters of Hoeth, for the Blades of
+Hoeth) stays out of the patch's own elite-infantry theme, so the list's remodel keeps the relation it was written for.
+A list entry that changes a unit's shot changes its alternate ammunition the same way.
+
+**Guns.** The gunpowder rule applies on top (Handgunners, Thunderers, Streltsi, Deck Gunners, Slayer Pirates). The
+list's numbers were written for the vanilla weapon, so on a gun they go through the same rule: a reload change is
+multiplied by the rule's reload factor, a missile damage change by its damage factor, and an ammunition change is made
+to the vanilla count before the rule cuts it. Deck Gunners, where the list asks for one second off the reload, end at
+(11 - 1) x 1.5 = 15 seconds against their neighbours' 16.5: still faster, as the list wanted. The rule itself does not
+move a gun's price, so a price change on a gun is the list's alone.
+
+**It was written for multiplayer.** The entries held for campaign are at the end of this page. Everything else is in
+as written, including a few nerfs campaign players never asked for (Zombies +25 gold, Skeleton Horse Archers +25 gold,
+Wrathmongers -4 melee defence). If one of them is wrong for campaign, that is a suggestion worth posting.
 
 `tools/community.py` holds every entry; `tools/community_check.py` builds the patch with and without the list and
-checks that every unit changes exactly as the list says and nothing else moves.
+checks that every unit changes exactly as the list says and nothing else moves, the artillery pieces, mounts and
+alternate ammunition included. `tools/community_resolved.json` records which units each entry names and the numbers it
+applies: the entries are matched by the unit's English name, so if CA renames a unit, adds one with a matching name, or
+a number in the list is edited, the build fails until someone has looked.
 
 ## Crewed artillery (line 373: more responsive artillery)
 

@@ -1,0 +1,4 @@
+numpy
+zstandard
+lz4
+lupa

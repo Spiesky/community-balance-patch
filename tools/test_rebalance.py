@@ -27,11 +27,28 @@ import rebalance_solve as RS
 import decided
 
 S = json.load(open(os.path.join(HERE, "_survey.json")))
-R = json.load(open(os.path.join(HERE, "_rebalance.json")))["units"]
+R = json.load(open(os.environ.get("CBP_PROPOSALS") or os.path.join(HERE, "_rebalance.json")))["units"]
 ROWS = {u["key"]: u for u in S["units"]}
 UM.WEIGHTS.update(S["weights"]); UM.reset()
 
 failures = []
+
+# the beta's own rules are checked when the proposals are the beta's (CBP_PROPOSALS=_beta.json)
+BETA = any(o.get("community") or o.get("theme") for o in R)
+BY_NAME = {}
+for _o in R:
+    BY_NAME.setdefault(_o["name"], []).append(_o)
+NAMED, SPOKEN_FOR = set(), set()
+if BETA:
+    import community as _C
+    _by_key = {o["key"]: o for o in R}
+    for _line, _pat, _ch, _keys in _C.resolve([o["key"] for o in R], UM.name, UM.faction):
+        NAMED.update(_keys)
+        if not _ch.get("_follows"):
+            for _k in _keys:
+                _b = RS.base_of(_by_key[_k], BY_NAME)
+                if _b is not None and _b is not _by_key[_k]:
+                    SPOKEN_FOR.add(_b["key"])
 
 
 def check(cond, msg):
@@ -42,6 +59,23 @@ def check(cond, msg):
 def test_model():
     ek = UM.card("wh_main_emp_cav_empire_knights")
     check(abs(UM.regiment_power(ek) - 1.0) < 1e-9, "Empire Knights regiment is not 1.00")
+    # overkill: a blow never counts for more than its target's hit points, and the cap never raises anything
+    import cavalry_model as CM
+    bk, slave = UM.card("wh_dlc02_vmp_cav_blood_knights_0"), UM.card("wh2_main_skv_inf_skavenslaves_0")
+    big = RS.scaled(bk, 2.5)
+    check(CM.blow(big, slave, usable=True) <= slave["hp"] * 0.9 + 1e-9, "a capped blow exceeds the target's hit points")
+    check(CM.blow(big, slave, usable=True) < CM.blow(big, slave), "the cap does not bite on a 2.5x Blood Knight against a Skavenslave")
+    for key in ("wh_main_emp_inf_swordsmen", "wh_main_grn_mon_giant", "wh_dlc02_vmp_cav_blood_knights_0"):
+        c = UM.card(key)
+        check(UM.usable_power(c) <= UM.regiment_power(c) + 1e-9, "%s: usable power above power" % key)
+    check(CM.USABLE is False, "usable_power left the cap switched on")
+    # the gunpowder rule's numbers are part of what the Workshop page promises
+    GP = RS.GP
+    check((GP.DAMAGE, GP.RELOAD) == (1.6, 1.5), "gunpowder constants changed: %s, %s (the pages say 60%% and 50%%)" % (GP.DAMAGE, GP.RELOAD))
+    check((GP.ammo(22), GP.ammo(20), GP.ammo(6), GP.ammo(0)) == (14, 13, 4, 0), "gunpowder ammunition rule changed")
+    hg = UM.card("wh_main_emp_inf_handgunners")
+    check(GP.applies(hg, "missile_infantry") and not GP.applies(UM.card("wh_main_emp_inf_crossbowmen"), "missile_infantry"),
+          "gunpowder rule: Handgunners must be covered and Crossbowmen not")
     for key in ("wh_main_emp_inf_swordsmen", "wh_main_grn_mon_giant", "wh2_main_lzd_inf_temple_guards", "wh_main_emp_inf_handgunners", "wh_main_chs_cav_chaos_chariot"):
         c = UM.card(key)
         p0 = UM.regiment_power(c)
@@ -82,8 +116,34 @@ def test_solver():
     for o in R:
         key, a, b = o["key"], o["after"], o["before"]
         if key not in decided.STATS:
-            for f in ("armour", "cb", "morale"):
+            for f in ("armour", "morale"):
                 check(abs(a[f] - b[f]) < 1e-9, "%s: %s changed" % (key, f))
+            if o.get("elite") and (o.get("k") or 1.0) > 1.0:      # a lore elite's charge scales with its damage
+                check(abs(a["cb"] - round(b["cb"] * o["k"])) < 1e-9, "%s: charge bonus %s is not %s x %.2f" % (key, a["cb"], b["cb"], o["k"]))
+                check(o["new_cost"] <= o["cost"] * o["usable"] + 25, "%s: price rises faster than its usable power" % key)
+            else:
+                check(abs(a["cb"] - b["cb"]) < 1e-9, "%s: charge bonus changed" % key)
+            if o.get("gun"):                                       # gunpowder: the same damage over a battle, the price stays
+                m0, m1 = b["missile"], a["missile"]
+                check(m1["ammo"] == RS.GP.ammo(m0["ammo"]), "%s: ammunition %s, expected %s" % (key, m1["ammo"], RS.GP.ammo(m0["ammo"])))
+                check(abs(m1["reload"] / m0["reload"] - RS.GP.RELOAD) < 1e-6, "%s: reload factor" % key)
+            if o.get("gun") and not o.get("elite") and (o["action"] == "gunpowder" or BETA):
+                check(o["new_cost"] == o["cost"], "%s: the gunpowder rule moved the price (%d -> %d)" % (key, o["cost"], o["new_cost"]))
+            if o.get("theme"):                                     # the theme: stronger, at the vanilla price
+                check(o["new_cost"] == o["cost"], "%s: themed unit's price moved (%d -> %d)" % (key, o["cost"], o["new_cost"]))
+                check(o["caste"] == "melee_infantry", "%s: themed but not melee infantry" % key)
+                check(key not in NAMED and key not in SPOKEN_FOR, "%s: themed although the community list covers it" % key)
+                base = RS.base_of(o, BY_NAME)
+                if UM.card(key)["renown"] or (base is not None and base is not o):
+                    check(base is not None and base.get("theme") and base["action"] != "none",
+                          "%s: a regiment of renown in the theme whose base is not" % key)
+                    if base is not None and base.get("k") and o.get("k"):
+                        check(abs(o["k"] - base["k"]) < 1e-6, "%s: factor x%.3f, its base's is x%.3f" % (key, o["k"], base["k"]))
+        if BETA and key in NAMED and not o.get("elite"):           # a list unit takes nothing from the model but the gun rule
+            check(o["action"] in ("none", "gunpowder") and (o.get("k") or 1.0) == 1.0 and o["new_cost"] == o["cost"],
+                  "%s: on the community list but also changed by the model (%s)" % (key, o["action"]))
+        if BETA and not o.get("elite") and not o.get("theme") and not o.get("gun"):
+            check(o["action"] == "none", "%s: changed in the beta without a theme (%s)" % (key, o["action"]))
         check(o.get("drift", 0) <= 0.02, "%s: drift %.4f" % (key, o.get("drift", 0)))
         if o["action"] != "none":
             check(o["new_cost"] % 25 == 0 and o["new_campaign_cost"] % 25 == 0, "%s: price not a multiple of 25" % key)

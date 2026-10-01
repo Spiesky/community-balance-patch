@@ -485,6 +485,17 @@ def regiment_power(c):
     return profile(c)["power_reg"] / ek()
 
 
+def usable_power(c):
+    """the regiment's power with overkill taken out (cavalry_model.blow, usable): on the same scale, Empire Knights =
+    1.00 (their own blows are never capped). Used to price changes that multiply a unit's damage."""
+    scale = ek()
+    CM.USABLE = True
+    try:
+        return profile(c)["power_reg"] / scale
+    finally:
+        CM.USABLE = False
+
+
 def power(c):
     """per model, on the same scale: a unit of 60 models each as good as an Empire Knight has 60 x 1/60 = 1.00 per model"""
     return regiment_power(c) / c["men"] * 60.0

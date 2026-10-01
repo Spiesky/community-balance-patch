@@ -1,0 +1,53 @@
+Vanilla campaigns, with units that are worth their price: elites you can feel, gunpowder that plays like gunpowder, and every number measured and argued in the open.
+
+[b]Beta 0.2.0[/b], built for game version 9.0. [url=https://github.com/Spiesky/community-balance-patch/blob/main/reports/beta_changelog.md]Every change, unit by unit[/url]. This is an early beta. Things will be off, and that is the point: play it and tell me.
+
+[h2]What is in the beta[/h2]
+
+255 units change. Four things, and nothing else:
+
+[list]
+[*][b]Lore elites are fewer and far stronger.[/b] Every Blood Knight is a vampire, so there are 24 of them instead of 60, each with the health, the blows and the charge of two and a half riders. Grail Knights (32) and Grail Guardians (24) get the same treatment, and the Swords of Chaos become the champions they should be. A unit made smaller never has less total health than vanilla. What it trades: fewer swings. They kill elite and large targets much faster and clear chaff more slowly.
+[*][b]Gunpowder hits hard and reloads slow.[/b] Handguns, rifles, jezzails, blunderbusses and pistols fire a 60% heavier volley, take 50% longer to reload and carry less ammunition (Handgunners: 14 volleys instead of 22). The damage over a whole battle stays about the same and the price does not move; how you use them changes. Get them into position, fire, then pull back or let them reload in safety.
+[*][b]Elite infantry is worth its price.[/b] 23 units the lore rates elite (Greatswords, Bestigors, Slayers, Ironbreakers, Exalted daemons and more) get more health and damage, up to about 17%, at the vanilla price.
+[*][b]The multiplayer community's balance list.[/b] The peer-reviewed recommendations of the Total Tavern and Vermin League communities (patch 7.1+), as they wrote them: Chaos Warriors, Chosen, Temple Guard, Phoenix Guard, Black Orcs, Great Eagles, more responsive artillery and many more, 195 units in all with their regiments of renown. Left out: what CA already did in 8.1, and a few buffs to units campaign players already find too strong.
+[/list]
+
+Not in it: auto-resolve, lords and heroes, spells. Everything else I have measured (every unit in the game against its price and the lore) is still a proposal on GitHub, and goes in theme by theme once players have tested it.
+
+[h2]Things you will notice[/h2]
+
+[list]
+[*]The lore elites cost more, in recruitment and upkeep: Blood Knights about 30% more for 24 than for 60, the Swords of Chaos 2400 instead of 1500. Grail Knights and Grail Guardians cost almost what they did.
+[*]Gunners run dry sooner and stand reloading for longer. That is the rule working; say so if it is no fun.
+[*]The community list was written for multiplayer and carries a few nerfs with it: Zombies and Skeleton Horse Archers cost 25 more, Ruglud's Armoured Orcs 50 more, Wrathmongers lose 4 melee defence and 5 leadership, Gor Herds a point of damage. If one of them is wrong for campaign, tell me.
+[/list]
+
+[h2]Campaign first[/h2]
+
+The mod is balanced for campaign; custom battles are where it is tested. Recruitment cost and upkeep move with the multiplayer price. In multiplayer both players need the mod.
+
+[h2]How to help[/h2]
+
+[list]
+[*]Play it and tell me what felt off, in the comments here.
+[*]Run one test, about twenty minutes: [url=https://github.com/Spiesky/community-balance-patch/blob/main/units/blood_knights.md]Blood Knights against Demigryph Knights[/url] is the one I need most. Post what you saw in the discussions here.
+[*]Run the optional [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3810476307]Battle Logger[/url]. It writes how every unit did to a text file on your PC. Drop that file on [url=https://spiesky.github.io/community-balance-patch/]the upload page[/url] to see what is in it, then copy the summary into a comment here or send the whole log to GitHub.
+[*]Suggest a change with numbers, here or [url=https://github.com/Spiesky/community-balance-patch]on GitHub[/url].
+[/list]
+
+How a change gets in is [url=https://github.com/Spiesky/community-balance-patch/blob/main/docs/HOW_DECISIONS_ARE_MADE.md]written down[/url]. While the mod is small I decide. From the next release on, every change is posted with its reason a week before it ships, and a test result reopens any decision, including what is already in.
+
+[h2]Compatibility[/h2]
+
+[list]
+[*]Data only, no scripts.
+[*]It changes unit stats, prices, missile weapons and the movement of some artillery pieces and mounts, so any other mod that edits the same units will clash with it.
+[*]Built to sit alongside the Community Bug Fix Mod: where that mod fixes Slayer Pirates, its fix takes precedence and they stay as in vanilla. Not yet tested together in game.
+[*]Back up your save before adding or removing it mid-campaign.
+[*]After a game update I rebuild it as soon as I can. Until then, the game version this build was made for is at the top.
+[/list]
+
+[h2]Credits[/h2]
+
+The balance list is the work of the Total Tavern and Vermin League communities: [url=https://community.creative-assembly.com/total-war/total-war-warhammer/forums/15-total-war-warhammer/threads/13577-community-sourced-peer-reviewed-balance-recommendations-list-patch-7-1]Community sourced, peer-reviewed balance recommendations list (patch 7.1+)[/url]. The patch is maintained by Spiesky. The community part is everyone who posts a test or a number.

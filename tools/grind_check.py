@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """Elites against chaff: how many chaff models an elite unit kills for every model it loses, vanilla and patched.
 
-The design goal: a unit of Grail Knights should be able to grind through Skavenslaves more or less for ever. Worst case:
+The question: how long can an elite unit keep grinding chaff, and how fast does it clear it? Worst case:
 the chaff never routs and keeps coming. Each elite model is fought by REACH chaff models at once (the ones that fit
 around it); every model's damage is the game's melee formula (cavalry_model.blow) on the simulator's effective cards,
-passives included, no charges (a grind is sustained melee).
+passives included, no charges (a grind is sustained melee). A blow kills at most the models it can reach (one, or a
+splash attack's few): damage beyond a chaff model's hit points is overkill and counts for nothing.
+
+Two figures per unit: chaff killed for every elite model lost (how long the unit can keep it up), and chaff killed per
+minute by the whole unit (how fast). Fewer, stronger models do better on the first and worse on the second.
 
     python3 grind_check.py
 """
@@ -29,10 +33,10 @@ def eff(card, other):
 
 def ratio(elite, chaff):
     e, c = eff(elite, chaff), eff(chaff, elite)
-    kill = M.blow(e, c) / e["interval"] / chaff["hp"]                     # chaff models one elite model kills per second
+    kill = M.blow(e, c, usable=True) / e["interval"] / chaff["hp"]        # chaff models one elite model kills per second
     reach = REACH["cavalry" if "cav" in elite["key"] or elite.get("mount") else "infantry"]
     lose = reach * M.blow(c, e) / c["interval"] / elite["hp"]             # elite models lost per elite model per second
-    return kill / lose if lose > 0 else float("inf")
+    return (kill / lose if lose > 0 else float("inf")), kill * 60.0 * elite["men"]
 
 
 def main():
@@ -40,15 +44,15 @@ def main():
         if ck not in UM.LU:
             continue
         chaff = UM.card(ck)
-        print("\nagainst %s (%d models, %.0f HP each): chaff killed per elite model lost; whole chaff units the elite unit destroys" % (chaff["label"], chaff["men"], chaff["hp"]))
+        print("\nagainst %s (%d models, %.0f HP each): chaff killed per elite model lost, and per minute by the whole unit" % (chaff["label"], chaff["men"], chaff["hp"]))
         for k in ELITES:
             if k not in UM.LU:
                 continue
             v, _ = UM.card(k), None
             p, _ = RV.after(k)
-            rv, rp = ratio(v, chaff), ratio(p, chaff)
-            print("   %-34s vanilla %6.1f (%4.1f units)   patched %6.1f (%4.1f units)" % (
-                v["label"][:34], rv, rv * v["men"] / chaff["men"], rp, rp * p["men"] / chaff["men"]))
+            (rv, mv), (rp, mp) = ratio(v, chaff), ratio(p, chaff)
+            print("   %-34s vanilla %6.1f per model lost, %4.0f a minute   patched %6.1f per model lost, %4.0f a minute" % (
+                v["label"][:34], rv, mv, rp, mp))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,23 @@
+#battle;v2;2026-10-02 21:14;campaign=1;type=land_normal;multiplayer=0;siege=0;player=1;attacker=1;winner=1;secs=612;cbp=0.2.0;mods=community_balance_patch.pack|community_balance_patch_battle_logger.pack
+u;1;1;1;wh_main_emp_cha_karl_franz_0;1;1;25;0;0;0.800;?;?;1;0;?;1
+u;1;1;1;wh_main_emp_inf_swordsmen;90;60;40;0;0;0.650;?;?;0;1;300;2
+u;1;1;1;wh_main_emp_inf_handgunners;34;34;80;0;0;1.000;0;20;0;0;?;3
+u;2;1;0;wh_main_grn_inf_orc_boyz;90;10;30;1;0;0.100;?;?;0;1;200;4
+u;2;1;0;wh_main_grn_mon_giant;1;0;12;0;1;0.000;?;?;1;1;410;5;a_field_added_later
+x;a line type this version does not know
+#end
+#result;v2;2026-10-02 21:15;mode=fought;winner=attacker;turn=37;difficulty=hard;type=land_normal;ambush=0;night=0;settlement=0;quest=;campaign=main_warhammer;player_side=1;cbp=0.2.0;mods=community_balance_patch.pack|community_balance_patch_battle_logger.pack
+r;1;1;1;wh_main_emp_cha_karl_franz_0;100;80;5;wh_main_emp_empire
+r;1;1;1;wh_main_emp_inf_swordsmen;100;65;3;wh_main_emp_empire
+r;1;1;1;wh_main_emp_inf_handgunners;50;50;1;wh_main_emp_empire
+r;2;1;0;wh_main_grn_inf_orc_boyz;100;0;0;wh_main_grn_greenskins
+r;2;1;0;wh_main_grn_mon_giant;100;0;0;wh_main_grn_greenskins
+#end
+#battle;v2;2026-10-04 19:00;campaign=1;type=land_normal;multiplayer=0;siege=0;player=2;attacker=0;winner=2;secs=350;cbp=0.2.0;mods=community_balance_patch.pack|community_balance_patch_battle_logger.pack
+u;1;1;0;wh_main_grn_inf_orc_boyz;120;0;10;1;1;0.000;?;?;0;1;100;1
+u;2;1;1;wh_main_emp_inf_swordsmen;120;110;90;0;0;0.900;?;?;0;0;?;2
+#end
+#result;v2;2026-10-04 19:30;mode=fought;winner=attacker;turn=41;difficulty=hard;type=land_normal;ambush=0;night=0;settlement=0;quest=;campaign=main_warhammer;player_side=1;cbp=0.2.0;mods=community_balance_patch.pack|community_balance_patch_battle_logger.pack
+r;1;1;1;wh_main_emp_cav_empire_knights;100;90;2;wh_main_emp_empire
+r;2;1;0;wh_main_vmp_inf_zombie;100;0;0;wh_main_vmp_vampire_counts
+#end

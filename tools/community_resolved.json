@@ -1,0 +1,1543 @@
+{
+"378 entities": {
+"changes": {
+"fire_arc_close": 60,
+"turn_speed": 60,
+"walk_speed": 2.2
+},
+"keys": [
+"wh_main_emp_art_great_cannon",
+"wh_main_emp_art_helblaster",
+"wh_main_emp_art_helstorm",
+"wh_main_emp_art_mortar"
+]
+},
+"380 entities": {
+"changes": {
+"fire_arc_close": 60,
+"turn_speed": 60,
+"walk_speed": 2.2
+},
+"keys": [
+"wh_main_brt_art_trebuchet"
+]
+},
+"381 entities": {
+"changes": {
+"fire_arc_close": 60,
+"turn_speed": 60,
+"walk_speed": 2.4
+},
+"keys": [
+"wh3_dlc26_grn_art_goblin_bolt_throwa"
+]
+},
+"382 entities": {
+"changes": {
+"fire_arc_close": 60,
+"turn_speed": 70,
+"walk_speed": 2.4
+},
+"keys": [
+"wh2_main_def_art_reaper_bolt_thrower",
+"wh2_main_hef_art_eagle_claw_bolt_thrower"
+]
+},
+"383 entities": {
+"changes": {
+"fire_arc_close": 70,
+"turn_speed": 70,
+"walk_speed": 2.4
+},
+"keys": [
+"wh_dlc06_dwf_art_boltthrower"
+]
+},
+"384 entities": {
+"changes": {
+"fire_arc_close": 60,
+"turn_speed": 60,
+"walk_speed": 2.2
+},
+"keys": [
+"wh_main_dwf_art_cannon",
+"wh_main_dwf_art_grudge_thrower",
+"wh_main_dwf_art_organ_gun"
+]
+},
+"385 entities": {
+"changes": {
+"fire_arc_close": 70,
+"turn_speed": 70,
+"walk_speed": 2.6
+},
+"keys": [
+"wh_main_dwf_art_flame_cannon"
+]
+},
+"386 entities": {
+"changes": {
+"fire_arc_close": 70,
+"turn_speed": 70
+},
+"keys": [
+"wh3_dlc25_dwf_art_goblin_hewer"
+]
+},
+"387 entities": {
+"changes": {
+"run_speed": 3.2,
+"turn_speed": 70
+},
+"keys": [
+"wh3_main_cth_art_fire_rain_rocket_battery",
+"wh3_main_cth_art_grand_cannon"
+]
+},
+"388 entities": {
+"changes": {
+"fire_arc_close": 60,
+"turn_speed": 60,
+"walk_speed": 2.2
+},
+"keys": [
+"wh_main_grn_art_doomdiver",
+"wh_main_grn_art_goblin_rock_lobber"
+]
+},
+"389 entities": {
+"changes": {
+"fire_arc_close": 60,
+"turn_speed": 60,
+"walk_speed": 2.2
+},
+"keys": [
+"wh2_main_skv_art_plagueclaw_catapult",
+"wh2_main_skv_art_warp_lightning_cannon",
+"wh3_dlc29_skv_art_plagueclaw_catapult_ror"
+]
+},
+"390 entities": {
+"changes": {
+"fire_arc_close": 60,
+"turn_speed": 60,
+"walk_speed": 2.2
+},
+"keys": [
+"wh2_dlc09_tmb_art_screaming_skull_catapult"
+]
+},
+"391 entities": {
+"changes": {
+"fire_arc_close": 60,
+"turn_speed": 60,
+"walk_speed": 2.2
+},
+"keys": [
+"wh2_dlc11_cst_art_carronade",
+"wh2_dlc11_cst_art_mortar"
+]
+},
+"392 entities": {
+"changes": {
+"fire_arc_close": 50,
+"turn_speed": 45,
+"walk_speed": 2.2
+},
+"keys": [
+"wh2_dlc11_cst_art_queen_bess"
+]
+},
+"395 followers of Chaos Warriors": {
+"changes": {
+"cb": 2,
+"ma": 2
+},
+"keys": [
+"wh_pro04_chs_inf_chaos_warriors_ror_0"
+]
+},
+"395 units": {
+"changes": {
+"cb": 2,
+"ma": 2
+},
+"keys": [
+"wh3_dlc20_chs_inf_chaos_warriors_mnur",
+"wh3_dlc20_chs_inf_chaos_warriors_msla",
+"wh3_dlc20_chs_inf_chaos_warriors_mtze",
+"wh3_dlc27_chs_inf_chaos_warriors_0",
+"wh3_main_kho_inf_chaos_warriors_0",
+"wh_main_chs_inf_chaos_warriors_0"
+]
+},
+"396 units": {
+"changes": {
+"ma": 2,
+"ws_ap": 2
+},
+"keys": [
+"wh3_dlc20_chs_inf_chaos_warriors_mnur_greatweapons",
+"wh3_dlc27_chs_inf_chaos_warriors_2",
+"wh3_dlc27_chs_inf_chaos_warriors_mnur_greatweapons",
+"wh_dlc01_chs_inf_chaos_warriors_2"
+]
+},
+"397 units": {
+"changes": {
+"md": 2,
+"ws_ap": 2
+},
+"keys": [
+"wh3_dlc20_chs_inf_chaos_warriors_mtze_halberds",
+"wh3_dlc27_chs_inf_chaos_warriors_1",
+"wh3_dlc27_chs_inf_chaos_warriors_mtze_halberds",
+"wh3_main_kho_inf_chaos_warriors_1",
+"wh_main_chs_inf_chaos_warriors_1"
+]
+},
+"398 units": {
+"changes": {
+"bvi": 3,
+"ma": 2
+},
+"keys": [
+"wh3_dlc27_kho_inf_chaos_warriors_2",
+"wh3_main_kho_inf_chaos_warriors_2"
+]
+},
+"399 units": {
+"changes": {
+"cb": 2,
+"ma": 2
+},
+"keys": [
+"wh3_dlc20_chs_inf_chaos_warriors_msla_hellscourges",
+"wh3_dlc27_chs_inf_chaos_warriors_msla_hellscourges"
+]
+},
+"401 followers of Chosen of Khorne": {
+"changes": {
+"cb": 2,
+"mass": 60,
+"ws_ap": 2
+},
+"keys": [
+"wh3_dlc26_chs_inf_chosen_mkho_ror"
+]
+},
+"401 units": {
+"changes": {
+"cb": 2,
+"mass": 60,
+"ws_ap": 2
+},
+"keys": [
+"wh3_dlc20_chs_inf_chosen_mkho",
+"wh3_dlc20_chs_inf_chosen_mnur",
+"wh3_dlc20_chs_inf_chosen_msla",
+"wh3_dlc20_chs_inf_chosen_mtze",
+"wh_main_chs_inf_chosen_0"
+]
+},
+"402 followers of Chosen of Nurgle (Great Weapons)": {
+"changes": {
+"cb": 4,
+"mass": 60,
+"ws_ap": 3,
+"ws_base": 1
+},
+"keys": [
+"wh3_dlc29_chs_inf_chosen_mnur_ror"
+]
+},
+"402 units": {
+"changes": {
+"cb": 4,
+"mass": 60,
+"ws_ap": 3,
+"ws_base": 1
+},
+"keys": [
+"wh3_dlc20_chs_inf_chosen_mnur_greatweapons",
+"wh_main_chs_inf_chosen_1"
+]
+},
+"403 units": {
+"changes": {
+"mass": 10,
+"md": 2,
+"ws_ap": 2
+},
+"keys": [
+"wh3_dlc20_chs_inf_chosen_mtze_halberds",
+"wh_dlc01_chs_inf_chosen_2"
+]
+},
+"404 units": {
+"changes": {
+"bvi": 2,
+"mass": 60,
+"ws_ap": 2
+},
+"keys": [
+"wh3_dlc20_chs_inf_chosen_mkho_dualweapons"
+]
+},
+"405 units": {
+"changes": {
+"cb": 2,
+"mass": 60,
+"ws_ap": 1,
+"ws_base": 1
+},
+"keys": [
+"wh3_dlc20_chs_inf_chosen_msla_hellscourges"
+]
+},
+"407 units": {
+"changes": {
+"cost": -25,
+"spacing": "wh3_main_infantry_chaotic_bloodletters"
+},
+"keys": [
+"wh3_dlc20_chs_inf_chaos_marauders_mkho_dualweapons"
+]
+},
+"408 units": {
+"changes": {
+"cost": -25
+},
+"keys": [
+"wh3_dlc20_chs_inf_chaos_marauders_mtze_spears"
+]
+},
+"409 followers of Chaos Knights": {
+"changes": {
+"ma": 2
+},
+"keys": [
+"wh_pro04_chs_cav_chaos_knights_ror_0"
+]
+},
+"409 units": {
+"changes": {
+"ma": 2
+},
+"keys": [
+"wh3_dlc20_chs_cav_chaos_knights_mkho",
+"wh3_dlc20_chs_cav_chaos_knights_mnur",
+"wh3_dlc20_chs_cav_chaos_knights_msla",
+"wh3_main_tze_cav_chaos_knights_0",
+"wh_main_chs_cav_chaos_knights_0"
+]
+},
+"413 units": {
+"changes": {
+"hp": 217,
+"ld": 5,
+"ws_ap": 14,
+"ws_base": 6
+},
+"keys": [
+"wh2_main_hef_mon_great_eagle",
+"wh_dlc05_wef_mon_great_eagle_0"
+]
+},
+"414 units": {
+"changes": {
+"cb": 2,
+"hp": 3,
+"ma": 1
+},
+"keys": [
+"wh2_dlc09_tmb_mon_fell_bats",
+"wh2_dlc11_cst_mon_fell_bats",
+"wh_main_vmp_mon_fell_bats"
+]
+},
+"415 units": {
+"changes": {
+"cost": -25
+},
+"keys": [
+"wh_dlc03_bst_inf_chaos_warhounds_0",
+"wh_dlc03_bst_inf_chaos_warhounds_1",
+"wh_main_chs_mon_chaos_warhounds_0",
+"wh_main_chs_mon_chaos_warhounds_1",
+"wh_main_nor_mon_chaos_warhounds_0",
+"wh_main_nor_mon_chaos_warhounds_1"
+]
+},
+"416 mounts": {
+"changes": {
+"acceleration": 7.0
+},
+"keys": [
+"wh_main_brt_mnt_cavalry_deprecated",
+"wh_main_brt_mnt_cavalry_fast_blood",
+"wh_main_brt_mnt_cavalry_hero_blood",
+"wh_main_brt_mnt_cavalry_knights_blood",
+"wh_main_brt_mnt_cavalry_knights_heavy_blood"
+]
+},
+"418 followers of Harpies": {
+"changes": {
+"cb": 2,
+"ma": 2
+},
+"keys": [
+"wh2_dlc14_def_inf_harpies_ror_0"
+]
+},
+"418 units": {
+"changes": {
+"cb": 2,
+"ma": 2
+},
+"keys": [
+"wh2_dlc16_wef_mon_harpies_0",
+"wh2_main_def_inf_harpies",
+"wh_dlc05_bst_mon_harpies_0"
+]
+},
+"460 entities": {
+"changes": {
+"radii_ratio": 0.5
+},
+"keys": [
+"wh2_dlc17_centigor_groghooves_blood",
+"wh_dlc03_bst_cav_centigor_blood"
+]
+},
+"464 units": {
+"changes": {
+"cost": -75
+},
+"keys": [
+"wh_dlc03_bst_inf_centigors_0"
+]
+},
+"465 units": {
+"changes": {
+"cost": -150
+},
+"keys": [
+"wh_dlc03_bst_inf_centigors_2"
+]
+},
+"466 units": {
+"changes": {
+"cost": -150
+},
+"keys": [
+"wh3_dlc24_bst_inf_centigors_great_weapons_mtze",
+"wh3_dlc24_tze_inf_centigors_great_weapons"
+]
+},
+"467 units": {
+"changes": {
+"cost": -100
+},
+"keys": [
+"wh_pro04_bst_inf_centigors_ror_0"
+]
+},
+"468 units": {
+"changes": {
+"cost": -25
+},
+"keys": [
+"wh2_dlc17_bst_inf_centigors_ror_1",
+"wh_dlc03_bst_inf_centigors_1"
+]
+},
+"470 followers of Gor Herd": {
+"changes": {
+"ws_ap": -1,
+"ws_base": -1
+},
+"keys": [
+"wh_pro04_bst_inf_gor_herd_ror_0"
+]
+},
+"470 units": {
+"changes": {
+"ws_ap": -1,
+"ws_base": -1
+},
+"keys": [
+"wh_dlc03_bst_inf_gor_herd_0"
+]
+},
+"471 units": {
+"changes": {
+"cb": 2
+},
+"keys": [
+"wh3_dlc25_bst_inf_pestigors",
+"wh3_dlc25_nur_inf_pestigors"
+]
+},
+"472 units": {
+"changes": {
+"md": 2
+},
+"keys": [
+"wh3_dlc24_bst_inf_tzaangors",
+"wh3_dlc24_tze_inf_tzaangors"
+]
+},
+"480 units": {
+"changes": {
+"accuracy": 27
+},
+"keys": [
+"wh2_dlc17_bst_inf_centigors_ror_1"
+]
+},
+"493 units": {
+"changes": {
+"accuracy": 4,
+"cb": 11
+},
+"keys": [
+"wh_pro04_brt_cav_mounted_yeomen_ror_0"
+]
+},
+"499 units": {
+"changes": {
+"hp": 320
+},
+"keys": [
+"wh3_dlc23_chd_mon_lammasu"
+]
+},
+"500 units": {
+"changes": {
+"cb": 2,
+"ma": 4,
+"ws_ap": 2
+},
+"keys": [
+"wh3_dlc23_chd_inf_infernal_guard_great_weapons"
+]
+},
+"501 units": {
+"changes": {
+"ma": 2,
+"rank_depth": 5
+},
+"keys": [
+"wh3_dlc23_chd_inf_infernal_guard"
+]
+},
+"502 units": {
+"changes": {
+"ma": 2
+},
+"keys": [
+"wh3_dlc23_chd_inf_chaos_dwarf_warriors_great_weapons"
+]
+},
+"571 units": {
+"changes": {
+"armour": 10,
+"ma": 4,
+"mass": 30,
+"ws_ap": 3,
+"ws_base": 1
+},
+"keys": [
+"wh2_main_def_inf_black_guard_0"
+]
+},
+"576 entities": {
+"changes": {
+"acceleration": 6,
+"deceleration": 7,
+"turn_speed": 80
+},
+"keys": [
+"wh2_main_def_cold_one_chariot",
+"wh2_main_def_cold_one_chariot_articulation"
+]
+},
+"579 units": {
+"changes": {
+"cost": -50
+},
+"keys": [
+"wh2_main_def_inf_shades_2"
+]
+},
+"587 units": {
+"changes": {
+"ammo": 2,
+"ws_ap": 2,
+"ws_base": 2
+},
+"keys": [
+"wh3_dlc25_dwf_inf_slayer_pirates"
+]
+},
+"588 followers of Hammerers": {
+"changes": {
+"mass": 80
+},
+"keys": [
+"wh_main_dwf_inf_hammerers_grudge_reward"
+]
+},
+"588 units": {
+"changes": {
+"mass": 80
+},
+"keys": [
+"wh_main_dwf_inf_hammerers"
+]
+},
+"590 units": {
+"changes": {
+"cost": -25,
+"shockwave": 1.0
+},
+"keys": [
+"wh3_dlc25_dwf_inf_thunderers_grudge_rakers"
+]
+},
+"592 followers of Longbeards (Great Weapons)": {
+"changes": {
+"ma": 2,
+"ws_ap": 2
+},
+"keys": [
+"wh_main_dwf_inf_longbeards_1_grudge_reward"
+]
+},
+"592 units": {
+"changes": {
+"ma": 2,
+"ws_ap": 2
+},
+"keys": [
+"wh_main_dwf_inf_longbeards_1"
+]
+},
+"593 units": {
+"changes": {
+"ma": 2
+},
+"keys": [
+"wh_main_dwf_inf_dwarf_warrior_1"
+]
+},
+"594 units": {
+"changes": {
+"cost": -25
+},
+"keys": [
+"wh_main_dwf_inf_thunderers_0"
+]
+},
+"607 units": {
+"changes": {
+"ma": 5
+},
+"keys": [
+"wh3_dlc24_cth_mon_jade_lion",
+"wh3_dlc24_cth_mon_jet_lion"
+]
+},
+"611 units": {
+"changes": {
+"accuracy": 27,
+"cost": -25
+},
+"keys": [
+"wh3_twa10_cth_inf_peasant_archers_ror"
+]
+},
+"619 units": {
+"changes": {
+"ma": 6,
+"ws_ap": 3,
+"ws_base": 1
+},
+"keys": [
+"wh_dlc06_grn_inf_nasty_skulkers_0"
+]
+},
+"620 followers of Night Goblins": {
+"changes": {
+"ma": 2,
+"ws_base": 1
+},
+"keys": [
+"wh_dlc06_grn_inf_da_eight_peaks_loonies_0"
+]
+},
+"620 units": {
+"changes": {
+"cost": -25,
+"ma": 2,
+"ws_base": 1
+},
+"keys": [
+"wh_main_grn_inf_night_goblins"
+]
+},
+"621 units": {
+"changes": {
+"cost": -25,
+"ws_ap": 1
+},
+"keys": [
+"wh_dlc06_grn_inf_da_warlords_boyz_0"
+]
+},
+"622 units": {
+"changes": {
+"ma": 2,
+"mass": 40,
+"ws_ap": 2
+},
+"keys": [
+"wh_main_grn_inf_black_orcs"
+]
+},
+"623 units": {
+"changes": {
+"ma": 2,
+"mass": 40
+},
+"keys": [
+"wh3_dlc26_grn_inf_black_orcs_shield"
+]
+},
+"624 units": {
+"changes": {
+"bvi": 2,
+"ma": 2
+},
+"keys": [
+"wh_dlc06_grn_inf_krimson_killerz_0"
+]
+},
+"626 units": {
+"changes": {
+"cb": 3,
+"ws_ap": 1,
+"ws_base": 1
+},
+"keys": [
+"wh_main_grn_cav_forest_goblin_spider_riders_0"
+]
+},
+"627 followers of Forest Goblin Spider Rider Archers": {
+"changes": {
+"missile_ap": 1,
+"missile_base": 1,
+"range": 15
+},
+"keys": [
+"wh_dlc06_grn_cav_deff_creepers_0"
+]
+},
+"627 units": {
+"changes": {
+"hp_total": 360,
+"missile_ap": 1,
+"missile_base": 1,
+"range": 15
+},
+"keys": [
+"wh_main_grn_cav_forest_goblin_spider_riders_1"
+]
+},
+"630 units": {
+"changes": {
+"accuracy": 4,
+"cost": 50
+},
+"keys": [
+"wh3_dlc26_grn_inf_rugluds_armoured_orcs"
+]
+},
+"635 units": {
+"changes": {
+"ws_ap": 10,
+"ws_base": 4
+},
+"keys": [
+"wh3_dlc26_grn_cav_mangler_squig"
+]
+},
+"636 followers of Goblin Wolf Riders": {
+"changes": {
+"cb": 3
+},
+"keys": [
+"wh_dlc06_grn_cav_moon_howlers_0"
+]
+},
+"636 units": {
+"changes": {
+"cb": 3
+},
+"keys": [
+"wh_main_grn_cav_goblin_wolf_riders_0"
+]
+},
+"637 units": {
+"changes": {
+"missile_base": 2
+},
+"keys": [
+"wh_main_grn_cav_goblin_wolf_riders_1"
+]
+},
+"638 units": {
+"changes": {
+"cost": -75
+},
+"keys": [
+"wh2_dlc15_grn_veh_snotling_pump_wagon_roller_0"
+]
+},
+"639 units": {
+"changes": {
+"cb": 3
+},
+"keys": [
+"wh2_dlc16_wef_mon_spider_hatchlings_0",
+"wh_dlc06_grn_mon_spider_hatchlings_0"
+]
+},
+"643 followers of Phoenix Guard": {
+"changes": {
+"mass": 30,
+"ws_ap": 3,
+"ws_base": 1
+},
+"keys": [
+"wh2_dlc10_hef_inf_keepers_of_the_flame_ror_0"
+]
+},
+"643 units": {
+"changes": {
+"mass": 30,
+"ws_ap": 3,
+"ws_base": 1
+},
+"keys": [
+"wh2_main_hef_inf_phoenix_guard"
+]
+},
+"644 followers of Lothern Sea Guard": {
+"changes": {
+"calibration_set": 4.4
+},
+"keys": [
+"wh2_dlc10_hef_inf_the_storm_riders_ror_0"
+]
+},
+"644 units": {
+"changes": {
+"calibration_set": 4.4
+},
+"keys": [
+"wh2_main_hef_inf_lothern_sea_guard_0"
+]
+},
+"645 followers of White Lions of Chrace": {
+"changes": {
+"cb": 4,
+"ws_ap": 2
+},
+"keys": [
+"wh2_dlc10_hef_inf_the_silverpelts_ror_0"
+]
+},
+"645 units": {
+"changes": {
+"cb": 4,
+"ws_ap": 2
+},
+"keys": [
+"wh2_main_hef_inf_white_lions_of_chrace_0"
+]
+},
+"646 followers of Spearmen": {
+"changes": {
+"ma": 2
+},
+"keys": [
+"wh2_dlc10_hef_inf_the_scions_of_mathlann_ror_0"
+]
+},
+"646 units": {
+"changes": {
+"_faction": "hef",
+"ma": 2
+},
+"keys": [
+"wh2_main_hef_inf_spearmen_0"
+]
+},
+"647 units": {
+"changes": {
+"cb": 6,
+"ld": 3
+},
+"keys": [
+"wh2_main_hef_cav_silver_helms_0",
+"wh2_main_hef_cav_silver_helms_1"
+]
+},
+"648 units": {
+"changes": {
+"cb": 10,
+"hp_set": 140,
+"men": 60,
+"rank_depth": 3,
+"ws_ap_set": 42,
+"ws_base_set": 18
+},
+"keys": [
+"wh3_dlc27_hef_inf_swordmasters_of_hoeth_ror"
+]
+},
+"649 units": {
+"changes": {
+"ammo": 4
+},
+"keys": [
+"wh3_dlc27_hef_veh_skycutter_bolt_thrower"
+]
+},
+"654 followers of Sisters of Avelorn": {
+"changes": {
+"missile_ap": 2
+},
+"keys": [
+"wh2_dlc10_hef_inf_everqueens_court_guards_ror_0"
+]
+},
+"654 units": {
+"changes": {
+"missile_ap": 2
+},
+"keys": [
+"wh2_dlc10_hef_inf_sisters_of_avelorn_0"
+]
+},
+"661 followers of Wrathmongers": {
+"changes": {
+"ld": -5,
+"md": -4
+},
+"keys": [
+"wh3_dlc26_kho_inf_wrathmongers_ror"
+]
+},
+"661 units": {
+"changes": {
+"ld": -5,
+"md": -4
+},
+"keys": [
+"wh3_dlc26_kho_inf_wrathmongers"
+]
+},
+"663 followers of Skullcrushers of Khorne": {
+"changes": {
+"armour": 10,
+"ld": 5
+},
+"keys": [
+"wh3_dlc20_kho_cav_skullcrushers_mkho_ror"
+]
+},
+"663 units": {
+"changes": {
+"armour": 10,
+"ld": 5
+},
+"keys": [
+"wh3_main_kho_cav_skullcrushers_0"
+]
+},
+"664 followers of Bloodcrushers of Khorne": {
+"changes": {
+"armour": 10,
+"md": 4
+},
+"keys": [
+"wh3_twa07_kho_cav_bloodcrushers_ror_0"
+]
+},
+"664 units": {
+"changes": {
+"armour": 10,
+"md": 4
+},
+"keys": [
+"wh3_main_kho_cav_bloodcrushers_0"
+]
+},
+"666 units": {
+"changes": {
+"accel": 5,
+"decel": 6,
+"hp": 1000,
+"ws_swap": 40
+},
+"keys": [
+"wh3_dlc26_kho_mon_slaughterbrute"
+]
+},
+"667 followers of Bloodthirster": {
+"changes": {
+"hp": 500,
+"ws_swap": 40
+},
+"keys": [
+"wh3_twa08_kho_mon_bloodthirster_0_ror"
+]
+},
+"667 units": {
+"changes": {
+"hp": 500,
+"ws_swap": 40
+},
+"keys": [
+"wh3_main_kho_mon_bloodthirster_0"
+]
+},
+"670 followers of Flesh Hounds of Khorne": {
+"changes": {
+"ma": 2,
+"mass": 400
+},
+"keys": [
+"wh3_twa10_kho_inf_flesh_hounds_of_khorne_ror"
+]
+},
+"670 units": {
+"changes": {
+"ma": 2,
+"mass": 400
+},
+"keys": [
+"wh3_main_kho_inf_flesh_hounds_of_khorne_0"
+]
+},
+"693 followers of War Bear Riders": {
+"changes": {
+"bvl": 2,
+"ld": 5
+},
+"keys": [
+"wh3_twa07_ksl_cav_war_bear_riders_ror_0"
+]
+},
+"693 units": {
+"changes": {
+"bvl": 2,
+"ld": 5,
+"mount_turn": 120
+},
+"keys": [
+"wh3_main_ksl_cav_war_bear_riders_1"
+]
+},
+"699 units": {
+"changes": {
+"cost": -25
+},
+"keys": [
+"wh3_main_ksl_inf_kossars_0",
+"wh3_main_ksl_inf_kossars_1",
+"wh3_main_ksl_inf_streltsi_0"
+]
+},
+"700 units": {
+"changes": {
+"cost": -50
+},
+"keys": [
+"wh3_dlc24_ksl_inf_akshina_ambushers"
+]
+},
+"702 units": {
+"changes": {
+"cost": -50
+},
+"keys": [
+"wh3_twa06_ksl_inf_tzar_guard_ror_0"
+]
+},
+"717 followers of Temple Guard": {
+"changes": {
+"ma": 2,
+"mass": 30,
+"ws_ap": 2,
+"ws_base": 1
+},
+"keys": [
+"wh2_dlc12_lzd_inf_temple_guards_ror_0"
+]
+},
+"717 units": {
+"changes": {
+"ma": 2,
+"mass": 30,
+"ws_ap": 2,
+"ws_base": 1
+},
+"keys": [
+"wh2_main_lzd_inf_temple_guards"
+]
+},
+"718 units": {
+"changes": {
+"cb": 4
+},
+"keys": [
+"wh2_main_lzd_inf_saurus_warriors_0",
+"wh2_main_lzd_inf_saurus_warriors_1"
+]
+},
+"719 followers of Saurus Spears": {
+"changes": {
+"ws_ap": 1,
+"ws_base": 2
+},
+"keys": [
+"wh2_dlc12_lzd_inf_saurus_warriors_ror_0"
+]
+},
+"719 units": {
+"changes": {
+"ws_ap": 1,
+"ws_base": 2
+},
+"keys": [
+"wh2_main_lzd_inf_saurus_spearmen_0",
+"wh2_main_lzd_inf_saurus_spearmen_1"
+]
+},
+"733 units": {
+"changes": {
+"speed": 4
+},
+"keys": [
+"wh2_main_lzd_cav_cold_ones_feral_0"
+]
+},
+"779 followers of Yhetees": {
+"changes": {
+"ma": 2,
+"speed": 8
+},
+"keys": [
+"wh3_dlc26_ogr_mon_yhetees_ror"
+]
+},
+"779 units": {
+"changes": {
+"ma": 2,
+"speed": 8
+},
+"keys": [
+"wh3_dlc26_ogr_mon_yhetees"
+]
+},
+"788 followers of Plague Monk Censer Bearers": {
+"changes": {
+"ma": 3
+},
+"keys": [
+"wh2_dlc12_skv_inf_plague_monk_censer_bearer_ror_0"
+]
+},
+"788 units": {
+"changes": {
+"ma": 3
+},
+"keys": [
+"wh2_main_skv_inf_plague_monk_censer_bearer"
+]
+},
+"789 followers of Death Runners": {
+"changes": {
+"bvi": 2
+},
+"keys": [
+"wh2_dlc14_skv_inf_death_runners_ror_0"
+]
+},
+"789 units": {
+"changes": {
+"bvi": 2
+},
+"keys": [
+"wh2_main_skv_inf_death_runners_0"
+]
+},
+"790 units": {
+"changes": {
+"ws_ap": 2,
+"ws_base": 1
+},
+"keys": [
+"wh2_dlc16_skv_mon_wolf_rats_0"
+]
+},
+"797 units": {
+"changes": {
+"cost": -150
+},
+"keys": [
+"wh2_dlc12_skv_inf_stormvermin_ror_0"
+]
+},
+"798 units": {
+"changes": {
+"cost": -50
+},
+"keys": [
+"wh2_dlc16_skv_mon_hell_pit_abomination_ror_0"
+]
+},
+"833 units": {
+"changes": {
+"_faction": "emp",
+"cost": -25
+},
+"keys": [
+"wh_main_emp_inf_handgunners"
+]
+},
+"834 units": {
+"changes": {
+"cost": -50
+},
+"keys": [
+"wh2_dlc13_emp_veh_war_wagon_1"
+]
+},
+"835 units": {
+"changes": {
+"_faction": "emp",
+"cost": -25
+},
+"keys": [
+"wh_main_emp_inf_crossbowmen"
+]
+},
+"837 units": {
+"changes": {
+"missile_ap": 28,
+"missile_base": 9
+},
+"keys": [
+"wh3_dlc25_emp_veh_steam_tank_volley_gun"
+]
+},
+"838 followers of Demigryph Knights": {
+"changes": {
+"cb": 10,
+"ma": 2
+},
+"keys": [
+"wh_dlc04_emp_cav_royal_altdorf_gryphites_0"
+]
+},
+"838 units": {
+"changes": {
+"cb": 10,
+"ma": 2
+},
+"keys": [
+"wh_main_emp_cav_demigryph_knights_0"
+]
+},
+"840 units": {
+"changes": {
+"hp": 12
+},
+"keys": [
+"wh2_dlc13_emp_inf_huntsmen_ror_0"
+]
+},
+"841 units": {
+"changes": {
+"accuracy": 17,
+"range": 20
+},
+"keys": [
+"wh2_dlc13_emp_inf_archers_ror_0"
+]
+},
+"844 units": {
+"changes": {
+"_faction": "tmb",
+"cost": 25
+},
+"keys": [
+"wh2_dlc09_tmb_cav_skeleton_horsemen_archers_0"
+]
+},
+"845 units": {
+"changes": {
+"ma": 5
+},
+"keys": [
+"wh2_dlc09_tmb_mon_tomb_scorpion_0"
+]
+},
+"846 units": {
+"changes": {
+"armour": 10,
+"cost": -25
+},
+"keys": [
+"wh2_dlc09_tmb_inf_skeleton_archers_ror"
+]
+},
+"847 units": {
+"changes": {
+"armour": 10,
+"cost": -25,
+"md": -4,
+"ws_swap": 1
+},
+"keys": [
+"wh2_dlc09_tmb_inf_skeleton_spearmen_ror"
+]
+},
+"851 followers of Tomb Guard": {
+"changes": {
+"ma": 2
+},
+"keys": [
+"wh2_dlc09_tmb_inf_tomb_guard_ror"
+]
+},
+"851 units": {
+"changes": {
+"ma": 2
+},
+"keys": [
+"wh2_dlc09_tmb_inf_tomb_guard_0"
+]
+},
+"852 followers of Carrion": {
+"changes": {
+"cb": 4
+},
+"keys": [
+"wh2_dlc09_tmb_mon_carrion_ror"
+]
+},
+"852 units": {
+"changes": {
+"cb": 4
+},
+"keys": [
+"wh2_dlc09_tmb_mon_carrion_0"
+]
+},
+"883 followers of Deck Gunners": {
+"changes": {
+"reload": -1.0
+},
+"keys": [
+"wh2_dlc11_cst_inf_deck_gunners_ror_0"
+]
+},
+"883 units": {
+"changes": {
+"reload": -1.0
+},
+"keys": [
+"wh2_dlc11_cst_inf_deck_gunners_0"
+]
+},
+"886 units": {
+"changes": {
+"ma": 2,
+"md": 2
+},
+"keys": [
+"wh2_dlc11_cst_inf_syreens"
+]
+},
+"887 units": {
+"changes": {
+"cost": -25
+},
+"keys": [
+"wh2_dlc11_cst_inf_zombie_gunnery_mob_2"
+]
+},
+"889 units": {
+"changes": {
+"cost": -100
+},
+"keys": [
+"wh2_dlc11_cst_mon_rotting_prometheans_0"
+]
+},
+"894 units": {
+"changes": {
+"cost": -50
+},
+"keys": [
+"wh2_dlc11_cst_inf_zombie_deckhands_mob_ror_0"
+]
+},
+"898 followers of Hexwraiths": {
+"changes": {
+"ma": 4
+},
+"keys": [
+"wh_dlc04_vmp_cav_chillgheists_0"
+]
+},
+"898 units": {
+"changes": {
+"_faction": "vmp",
+"ma": 4,
+"mount_speed": 6
+},
+"keys": [
+"wh_main_vmp_cav_hexwraiths"
+]
+},
+"900 units": {
+"changes": {
+"cost": -100
+},
+"keys": [
+"wh_main_vmp_cav_black_knights_0"
+]
+},
+"902 units": {
+"changes": {
+"_faction": "vmp",
+"cost": 25
+},
+"keys": [
+"wh_main_vmp_inf_zombie"
+]
+},
+"903 units": {
+"changes": {
+"cost": -50
+},
+"keys": [
+"wh3_main_vmp_inf_grave_guard_2"
+]
+},
+"904 followers of Grave Guard": {
+"changes": {
+"ma": 2
+},
+"keys": [
+"wh_dlc04_vmp_inf_sternsmen_0"
+]
+},
+"904 units": {
+"changes": {
+"ma": 2
+},
+"keys": [
+"wh_main_vmp_inf_grave_guard_0",
+"wh_main_vmp_inf_grave_guard_1"
+]
+},
+"923 followers of Dragon Ogres": {
+"changes": {
+"accel": 4,
+"decel": 5,
+"ld": 3
+},
+"keys": [
+"wh_pro04_chs_mon_dragon_ogre_ror_0"
+]
+},
+"923 units": {
+"changes": {
+"accel": 4,
+"decel": 5,
+"ld": 3
+},
+"keys": [
+"wh_dlc01_chs_mon_dragon_ogre"
+]
+},
+"924 units": {
+"changes": {
+"accel": 4,
+"cost": -100,
+"decel": 5
+},
+"keys": [
+"wh_dlc01_chs_mon_dragon_ogre_shaggoth"
+]
+},
+"933 units": {
+"changes": {
+"cb": 5,
+"ld": 5
+},
+"keys": [
+"wh_dlc05_wef_cav_hawk_riders_0"
+]
+},
+"934 units": {
+"changes": {
+"cb": 2,
+"ws_ap": 2
+},
+"keys": [
+"wh2_dlc16_wef_inf_bladesingers_0"
+]
+},
+"935 units": {
+"changes": {
+"calibration_set": 3.4
+},
+"keys": [
+"wh_dlc05_wef_inf_deepwood_scouts_0"
+]
+},
+"941 units": {
+"changes": {
+"armour": 20
+},
+"keys": [
+"wh_pro04_wef_inf_eternal_guard_ror_0"
+]
+},
+"942 units": {
+"changes": {
+"mass": 20
+},
+"keys": [
+"wh_dlc05_wef_inf_eternal_guard_0",
+"wh_dlc05_wef_inf_eternal_guard_1"
+]
+},
+"943 units": {
+"changes": {
+"cost": -50
+},
+"keys": [
+"wh2_dlc16_wef_mon_zoats_ror_0"
+]
+}
+}

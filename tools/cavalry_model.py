@@ -167,8 +167,17 @@ def armour_block(armour):
     return below * (lo + 1.0) / 2 + (1 - below)
 
 
-def blow(att, dfn, charging=False):
-    """expected damage of one melee attack"""
+USABLE = False              # True: a blow never does more than its targets have hit points (see blow)
+
+
+def blow(att, dfn, charging=False, usable=None):
+    """expected damage of one melee attack.
+
+    usable (default: the module's USABLE switch): cap the blow at the hit points of what it can reach, one model, or
+    the splash attack's models. A 188-damage swing into a 50-HP Skavenslave kills one Skavenslave, not 3.8 of them:
+    the rest is overkill. The survey's scale is fitted without the cap (it is pinned, docs/METHOD.md); the cap is used
+    where a change multiplies a unit's damage, the lore elites and grind_check.py, so their worth is not counted in
+    damage they cannot spend."""
     ma = att["ma"] + (att["cb"] if charging else 0.0)
     chance = min(90.0, max(8.0, 35.0 + ma - dfn["md"])) / 100.0
     base = att["base"] + (att["bvl"] if is_large(dfn) else att["bvi"])
@@ -177,8 +186,12 @@ def blow(att, dfn, charging=False):
         base, ap = base + att["cb"] * base / (base + ap), ap + att["cb"] * ap / (base + ap)
     dmg = base * (1.0 - armour_block(dfn["armour"])) + ap
     dmg *= 1.0 - resist(att, dfn) / 100.0
+    reach = 1.0
     if att["splash_size"] and SIZE_RANK.get(dfn["size"], 1) <= SIZE_RANK.get(att["splash_size"], 0):
         dmg *= att["splash_mult"]
+        reach = max(1.0, att["splash_n"])
+    if USABLE if usable is None else usable:
+        dmg = min(dmg, reach * dfn["hp"])
     return chance * dmg
 
 

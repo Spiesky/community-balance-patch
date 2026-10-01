@@ -18,7 +18,7 @@ import unit_model as UM
 import cavalry_sim as SIM
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-R = {o["key"]: o for o in json.load(open(os.path.join(HERE, "_rebalance.json")))["units"]}
+R = {o["key"]: o for o in json.load(open(os.environ.get("CBP_PROPOSALS") or os.path.join(HERE, "_rebalance.json")))["units"]}
 S = json.load(open(os.path.join(HERE, "_survey.json")))
 UM.WEIGHTS.update(S["weights"])
 UM.reset()
@@ -49,6 +49,8 @@ def after(key):
     a = o["after"]
     c = dict(c, men=a["men"], ma=a["ma"], md=a["md"], cb=a["cb"], hp=a["hp"], armour=a["armour"], morale=a["morale"],
              base=a["base"], ap=a["ap"], bvl=a["bvl"], bvi=a["bvi"])
+    if a.get("missile") and c.get("missile"):          # the gunpowder rule and any scaling of the shot
+        c["missile"] = dict(c["missile"], **{f: a["missile"][f] for f in ("base", "ap", "bvl", "bvi", "reload", "ammo") if f in a["missile"]})
     return c, o["new_cost"]
 
 

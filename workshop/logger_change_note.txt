@@ -1,0 +1,1 @@
+Battle Logger 2: hit points left for every unit, the winner, the battle type, whether a unit ever routed, ammunition, and the patch version; a campaign record for every battle the player fights or auto-resolves (turn, difficulty, strength before and after, experience). docs/LOG_FORMAT.md has every field. Checked against mock game objects, not yet in the game.

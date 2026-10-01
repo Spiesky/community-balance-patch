@@ -14,6 +14,7 @@ import sys
 import vanilla as V
 import unit_model as UM
 import community as C
+import gunpowder as GP
 from packread import Pack
 from rebalance_check import rows_of, norm
 
@@ -87,6 +88,73 @@ def expected(entries_for_key, men):
     return d, st
 
 
+def entity_problems(path):
+    """every battle_entities row the pack overrides in place (an engine, a mount, a hitbox) differs from vanilla in
+    exactly the columns a list line sets for it, with the values it sets"""
+    rows = {r["key"]: r for r in rows_of(Pack(path)).get("battle_entities", [])}
+    BE, MO = V.index("battle_entities"), V.index("mounts")
+    want = {}
+    for line, what, ents, sets in C.ARTILLERY + C.ENTITIES:
+        for e in ents:
+            want.setdefault(e, {}).update(sets)
+    line, what, rx, accel = C.MOUNT_ACCEL
+    for m in MO:
+        if rx.search(m) and MO[m]["entity"] in BE:
+            want.setdefault(MO[m]["entity"], {})["acceleration"] = accel
+    mounts = {}                                           # mount speed and turn, changed in place for every rider
+    for line, pat, ch, keys in C.resolve(UM.recruitable(), UM.name, UM.faction):
+        for k in keys:
+            lu = V.index("land_units")[V.index("main_units", "unit")[k]["land_unit"]]
+            if lu["mount"] in MO and ("mount_speed" in ch or "mount_turn" in ch):
+                mounts.setdefault(MO[lu["mount"]]["entity"], set()).update({"run_speed"} if "mount_speed" in ch else set(), {"turn_speed"} if "mount_turn" in ch else set())
+    out = []
+    for key, r in rows.items():
+        if key not in BE:
+            continue                                      # a per-unit clone (cbp_..._man): checked through the unit's stats
+        sets, changed = want.get(key, {}), {c for c in r if norm(r[c]) != norm(BE[key].get(c, ""))}
+        allowed = set(sets) | mounts.get(key, set()) | ({"run_speed"} if "walk_speed" in sets else set())
+        if changed - allowed:
+            out.append("entity %s: columns changed that no list line sets: %s" % (key, sorted(changed - allowed)))
+        for c, v in sets.items():
+            if norm(r[c]) != norm(v):
+                out.append("entity %s: %s is %s, the list says %s" % (key, c, r[c], v))
+    for key, sets in want.items():                      # not in the pack is right only if vanilla already has the values
+        if key not in rows and any(norm(BE[key].get(c, "")) != norm(v) for c, v in sets.items()):
+            out.append("entity %s: the list changes it but it is not in the pack" % key)
+    return out
+
+
+def alternate_problems(path, guns):
+    """a list entry that changes a unit's shot changes its alternate ammunition the same way"""
+    T = rows_of(Pack(path))
+    junctions = {str(r["id"]): r for r in T.get("unit_missile_weapon_junctions", [])}
+    missiles = {r["key"]: r for r in T.get("missile_weapons", [])}
+    projectiles = {r["key"]: r for r in T.get("projectiles", [])}
+    MIS, PJ = V.index("missile_weapons"), V.index("projectiles")
+    out = []
+    for line, pat, ch, keys in C.resolve(UM.recruitable(), UM.name, UM.faction):
+        moves = {k: v for k, v in ch.items() if k in ("missile_base", "missile_ap", "range", "reload")}
+        if not moves:
+            continue
+        for key in keys:
+            gd, gr = guns.get(key, (1.0, 1.0))
+            for j in V.where("unit_missile_weapon_junctions", unit=key):
+                if j["missile_weapon"] not in MIS:
+                    continue
+                jj = junctions.get(str(j["id"]))
+                p = jj and projectiles.get(missiles.get(jj["missile_weapon"], {}).get("default_projectile", ""))
+                if not p:
+                    out.append("%s: alternate ammunition %s is not changed with the unit's shot (entry %d)" % (UM.name(key), j["missile_weapon"], line))
+                    continue
+                vp = PJ[MIS[j["missile_weapon"]]["default_projectile"]]
+                for k, col, f in (("missile_base", "damage", gd), ("missile_ap", "ap_damage", gd), ("range", "effective_range", 1.0), ("reload", "base_reload_time", gr)):
+                    if k in moves:
+                        base = float(vp[col] or 0) * (gd if col in ("damage", "ap_damage") and key in guns else gr if col == "base_reload_time" and key in guns else 1.0)
+                        if abs(float(p[col]) - (base + moves[k] * f)) > 1.01:
+                            out.append("%s: alternate %s %s is %s, expected about %s (entry %d)" % (UM.name(key), j["missile_weapon"], col, p[col], base + moves[k] * f, line))
+    return out
+
+
 def main():
     os.makedirs(TMP, exist_ok=True)
     a = stats(build(os.path.join(TMP, "without.pack"), False))
@@ -95,13 +163,27 @@ def main():
     for line, pat, ch, keys in C.resolve(UM.recruitable(), UM.name, UM.faction):
         for k in keys:
             by_key.setdefault(k, []).append((line, ch))
-    skip = {o["key"] for o in __import__("json").load(open(PROPOSALS))["units"] if o.get("elite")}
+    props = __import__("json").load(open(PROPOSALS))["units"]
+    skip = {o["key"] for o in props if o.get("elite")}
+    # on a gun the list's missile numbers go through the gunpowder rule (community.apply): damage x, reload x, and the
+    # ammunition change is made to the vanilla count before the rule cuts it
+    guns = {o["key"]: tuple(o["gun"]) for o in props if o.get("gun")}
+    LUV, MUV = V.index("land_units"), V.index("main_units", "unit")
+    unresolved = [(line, pat) for line, pat, ch, keys in C.resolve(UM.recruitable(), UM.name, UM.faction) if not keys]
     # stats changed in place on shared entities (artillery engines, mounts) are checked on the entities, not here
     shared = {"mount_speed", "mount_turn"}
     fails, ok = [], 0
     for key in a:
         entries = [] if key in skip else [ch for _, ch in by_key.get(key, [])]
         d, st = expected(entries, int(a[key]["men"]))
+        if key in guns:
+            gd, gr = guns[key]
+            for s_, f_ in (("missile_base", gd), ("missile_ap", gd), ("reload", gr)):
+                if s_ in d:
+                    d[s_] = round(d[s_] * f_) if s_ != "reload" else d[s_] * f_
+            if "ammo" in d or "ammo" in st:
+                v0 = int(float(LUV[MUV[key]["land_unit"]]["primary_ammo"]))
+                st["ammo"] = GP.ammo(st["ammo"] if "ammo" in st else v0 + d.pop("ammo"))
         for s in a[key]:
             va, vb = a[key][s], b[key][s]
             if s == "hp" and "hp_set" in st:
@@ -121,7 +203,12 @@ def main():
                 fails.append("%s (%s) %s: %s -> %s, expected %s" % (UM.name(key), key, s, va, vb, st.get(s, d.get(s, "no change"))))
             else:
                 ok += 1
+    fails += entity_problems(os.path.join(TMP, "with.pack"))
+    fails += alternate_problems(os.path.join(TMP, "with.pack"), guns)
     print("%d unit stats as expected" % ok)
+    for line, pat in unresolved:                      # an entry naming no unit: CA renamed it, or the pattern is wrong
+        fails.append("entry %d (%s) names no unit in the game" % (line, pat))
+    fails += C.check_resolution(UM.recruitable(), UM.name, UM.faction)
     for f in fails:
         print("FAIL", f)
     print("PASS" if not fails else "%d problems" % len(fails))

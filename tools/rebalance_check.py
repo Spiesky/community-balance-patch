@@ -5,7 +5,8 @@
 
 What is checked, for every unit in the pack:
   identity      armour, charge bonus, morale, weapon type, attack interval, splash and shield are the vanilla values
-                (the decided four may change charge, morale and armour, as STATS says, nothing else)
+                (the decided four may change charge, morale and armour, as STATS says, nothing else; a lore elite's
+                charge bonus moves by its proposal's delta; a gun's ammunition is the gunpowder rule's)
   stats         attack, defence and bonus HP are the vanilla row plus the proposal's delta (the model folds passives
                 in, so absolutes would be wrong); the melee weapon the row points at is the land unit's copy carrying
                 vanilla damage, AP and bonuses times the proposal's factor, or the vanilla weapon when the factor is 1;
@@ -17,6 +18,8 @@ What is checked, for every unit in the pack:
   alternates    every alternate ammunition junction of a scaled unit points at a scaled copy in the pack
   held          units held for review are absent unless the pack was built with --include-review
   drift         identity_drift of every changed unit is under DRIFT_MAX
+  version       the pack carries the cbp_version localisation entry and it is the VERSION file's
+  auto-resolve  no autoresolver table is in the pack unless it was built with CBP_AUTORESOLVE=1
 """
 import json
 import math
@@ -27,10 +30,12 @@ import vanilla as V
 from packread import Pack
 from dbread import decode
 import decided as DECIDED
+import gunpowder as GP
 import unit_model as UM
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PACK = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(HERE), "build", "community_balance_patch.pack")
+PACK = (sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("--")
+        else os.environ.get("CBP_OUT") or os.path.join(os.path.dirname(HERE), "build", "draft", "community_balance_patch_DRAFT.pack"))
 PROPOSALS = os.environ.get("CBP_PROPOSALS") or os.path.join(HERE, "_rebalance.json")
 DRIFT_MAX = 0.02
 PREFIX = "gr_"
@@ -63,6 +68,22 @@ def rows_of(pack):
             _, cols, rows = decode(pack.get(n), n.split("/")[1])
             out.setdefault(t, []).extend(rows)
     return out
+
+
+def version_problems(pack):
+    """the pack's version entry must be exactly one row, cbp_version = the VERSION file, which the Battle Logger reads"""
+    import re
+    from refresh_vanilla import read_loc
+    version = open(os.path.join(os.path.dirname(HERE), "VERSION")).read().strip()
+    if not re.match(r"^\d+\.\d+(\.\d+)?$", version):
+        return ["the VERSION file does not hold a version number: %r" % version]
+    loc = pack.get("text/db/community_balance_patch.loc")
+    if not loc:
+        return ["no version entry (text/db/community_balance_patch.loc)"]
+    rows = read_loc(loc)
+    if rows != [["cbp_version", version, "false"]]:
+        return ["the version entry is %r, expected cbp_version = %s" % (rows, version)]
+    return []
 
 
 def main():
@@ -118,13 +139,25 @@ def main():
         decided = key in DECIDED.STATS
 
         # identity
-        for col in ("shield", "spacing", "man_entity", "mount", "engine", "attribute_group", "category", "class", "damage_mod_all", "damage_mod_physical", "damage_mod_missile", "damage_mod_magic", "damage_mod_flame", "primary_ammo"):
+        for col in ("shield", "spacing", "man_entity", "mount", "engine", "attribute_group", "category", "class", "damage_mod_all", "damage_mod_physical", "damage_mod_missile", "damage_mod_magic", "damage_mod_flame"):
             if not same(lu[col], v[col]):
                 fail("%s: %s changed %r -> %r" % (key, col, v[col], lu[col]))
+        want_ammo = GP.ammo(v["primary_ammo"]) if o.get("gun") and a.get("missile") else v["primary_ammo"]
+        if not same(lu["primary_ammo"], want_ammo):
+            fail("%s: ammunition %r, expected %r (vanilla %r)" % (key, lu["primary_ammo"], want_ammo, v["primary_ammo"]))
         if not decided:
-            for col in ("armour", "charge_bonus", "morale"):
+            for col in ("armour", "morale"):
                 if not same(lu[col], v[col]):
                     fail("%s: %s changed %r -> %r" % (key, col, v[col], lu[col]))
+            moves = abs(a["cb"] - b["cb"]) > 1e-9
+            if moves and not o.get("elite"):
+                fail("%s: charge bonus moves in the proposal but the unit is not a lore elite" % key)
+            # as a factor on the database value: the card's figure has passives folded in (Frenzy multiplies it)
+            want_cb = int(round(float(v["charge_bonus"]) * a["cb"] / b["cb"])) if moves else int(float(v["charge_bonus"]))
+            if int(float(lu["charge_bonus"])) != want_cb:
+                fail("%s: charge bonus %s, expected %s" % (key, lu["charge_bonus"], want_cb))
+            if o.get("elite") and (o.get("k") or 1.0) > 1.0 and abs(float(lu["charge_bonus"]) / float(v["charge_bonus"]) - o["k"]) > 0.02:
+                fail("%s: charge bonus x%.3f, the damage factor is x%.3f" % (key, float(lu["charge_bonus"]) / float(v["charge_bonus"]), o["k"]))
         else:
             s = DECIDED.STATS[key]
             for col, want in (("charge_bonus", s["charge_bonus"]), ("morale", s["morale"]), ("armour", s["armour"]), ("melee_attack", s["melee_attack"]), ("melee_defence", s["melee_defence"]), ("bonus_hit_points", s["bonus_hit_points"])):
@@ -198,9 +231,11 @@ def main():
                             fail("%s: alternate %s points at a missing copy" % (key, jj["missile_weapon"])); continue
                         referenced.add(("missile_weapons", amw["key"])); referenced.add(("projectiles", ap_["key"]))
                         vap = PJ[MIS[j["missile_weapon"]]["default_projectile"]]
-                        for col in ("damage", "ap_damage"):
+                        for col in ("damage", "ap_damage", "bonus_v_large", "bonus_v_infantry"):
                             if abs(int(float(ap_[col])) - round(float(vap[col] or 0) * k * gd)) > 1:
                                 fail("%s: alternate %s %s %s, expected %s" % (key, j["missile_weapon"], col, ap_[col], round(float(vap[col] or 0) * k * gd)))
+                        if abs(float(ap_["base_reload_time"]) - float(vap["base_reload_time"]) * gr) > 0.02:
+                            fail("%s: alternate %s reload %s, expected %s" % (key, j["missile_weapon"], ap_["base_reload_time"], float(vap["base_reload_time"]) * gr))
         # size: entities are the vehicles or the monster, num_men counts the crew too; only a resize changes it
         want_men = a["men"] if a["men"] != b["men"] else int(mu["num_men"])
         if int(mrow["num_men"]) != want_men:
@@ -228,6 +263,14 @@ def main():
     for mw in missiles.values():
         if mw["default_projectile"] not in projectiles and mw["default_projectile"] not in PJ:
             fail("missile weapon %s: projectile %s missing" % (mw["key"], mw["default_projectile"]))
+
+    # the version entry, and no auto-resolve tables unless asked for
+    if not any(a for a in sys.argv[1:] if not a.startswith("--") and a != PACK):
+        for msg in version_problems(pack):
+            fail(msg)
+    if any("autoresolver" in n for n, _, _ in pack.entries) and (
+            os.environ.get("CBP_AUTORESOLVE") != "1" or os.path.basename(PACK) == "community_balance_patch.pack"):
+        fail("autoresolver tables are in the pack; they belong in the test pack (autoresolve_rules.py)")
 
     n = len(main)
     if fails:
