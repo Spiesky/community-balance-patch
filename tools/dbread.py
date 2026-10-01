@@ -47,8 +47,12 @@ def load_defs(table):
     patch_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "schema_patch.json")
     if os.path.exists(patch_path):
         import json as _json
-        for pv, pf in _json.load(open(patch_path)).get(table, {}).items():
+        patch = _json.load(open(patch_path))
+        for pv, pf in patch.get(table, {}).items():
             defs[int(pv)] = [tuple(f) for f in pf]
+        # "_fallback": used only where the schema has no layout for that version at all (an older schema file)
+        for pv, pf in patch.get("_fallback", {}).get(table, {}).items():
+            defs.setdefault(int(pv), [tuple(f) for f in pf])
     _cache[table] = defs
     return defs
 

@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Big-picture discussion
-    url: https://github.com/Spiesky/community-balance-patch/discussions
-    about: For open questions ("what should this unit be?") rather than concrete changes.
+  - name: Talk about it on the Steam Workshop page
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3810476227
+    about: Comments and discussion threads on the Workshop page count as much as an issue here. No GitHub account needed.
+  - name: How decisions are made
+    url: https://github.com/Spiesky/community-balance-patch/blob/main/docs/HOW_DECISIONS_ARE_MADE.md
+    about: Who decides today, what reopens a decision, and when the vote switches on.

@@ -1,0 +1,21 @@
+Title: This week's test: Blood Knights (Lances) against Demigryph Knights
+
+The patch turns 60 Blood Knights into 24, each with two and a half times the health and the blows. My two combat models disagree on whether 24 of them beat Demigryph Knights. One custom battle settles more than both models.
+
+The recipe (about twenty minutes):
+
+1. Custom battle, unit size Ultra, battle difficulty Normal, time limit 60 Minutes, map Crossroads - Multiplayer or any flat, open map (say which).
+2. You set up both armies. Yours (Vampire Counts): a Vampire Lord on foot, no spells, and one unit of Blood Knights (Lances). The AI's (The Empire): a General of the Empire on foot and one unit of Demigryph Knights (the plain ones, not Halberds).
+3. Order your lord to attack the enemy lord. Charge the Demigryph Knights head on with the Blood Knights and start a stopwatch. No further orders.
+4. When one of the two cavalry units is dead or routs for good: pause. Write down who won, the winner's health bar as a share, its models left, and the time. Then quit the battle.
+5. Three runs. If you have time, swap sides and do three more, and run it once with the patch switched off.
+
+Post it like this:
+
+Blood Knights (Lances) vs Demigryph Knights, patch 0.2.0, Ultra, Normal, Crossroads
+me as Blood Knights: won, about 60%, 14 models, 2:10 / won, about half, 11 models, 2:40 / lost, enemy about 20%, 3:05
+
+Everything about how to test, and what not to conclude from one battle: https://github.com/Spiesky/community-balance-patch/blob/main/docs/TESTING.md
+The unit's numbers: https://github.com/Spiesky/community-balance-patch/blob/main/units/blood_knights.md
+
+I will post my own runs in this thread first.

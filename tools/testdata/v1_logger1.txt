@@ -1,0 +1,12 @@
+# Community Balance Patch Battle Logger. Share this file at https://spiesky.github.io/community-balance-patch/ - thank you!
+#battle;v1;2026-09-30 20:01;multiplayer=0;siege=0;mods=community_balance_patch.pack|community_balance_patch_battle_logger.pack
+u;1;1;1;wh_main_emp_inf_swordsmen;120;90;40;0;0
+u;1;1;1;wh_main_emp_inf_handgunners;90;90;60;0;0
+u;2;1;0;wh_main_grn_inf_orc_boyz;120;20;30;1;0
+u;2;1;0;wh_main_grn_mon_giant;1;0;?;0;1
+#end
+#autoresolve;v1;2026-09-30 20:10;winner=attacker;mods=community_balance_patch.pack|community_balance_patch_battle_logger.pack
+a;1;1;wh_main_emp_inf_swordsmen;100;80
+a;1;1;wh_main_emp_inf_handgunners;100;50
+a;2;0;wh_main_grn_inf_orc_boyz;100;0
+#end

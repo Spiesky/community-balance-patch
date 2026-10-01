@@ -7,7 +7,7 @@ body:
     id: version
     attributes:
       label: Mod version
-      description: From the Workshop page or the mod's changelog. Write "vanilla" if you tested without the mod.
+      description: The Workshop page has it, near the top of the description and in the change notes (e.g. "0.2.0"). The Battle Logger also writes it into the log as cbp=. Write "vanilla" if you tested without the mod.
     validations:
       required: true
   - type: input
@@ -30,27 +30,46 @@ body:
       options:
         - Custom battle, unit vs unit
         - Custom battle, full armies
-        - Campaign battle
+        - Campaign battle, fought
+        - Campaign battle, auto-resolved
         - Multiplayer
     validations:
       required: true
-  - type: input
-    id: settings
+  - type: dropdown
+    id: unit_size
     attributes:
-      label: Unit size and difficulty
-      description: e.g. "Ultra, Legendary"
+      label: Unit size
+      description: The tests are written for Ultra (docs/TESTING.md). Other sizes are welcome but are kept apart.
+      options:
+        - Ultra
+        - Large
+        - Medium
+        - Small
+    validations:
+      required: true
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Battle difficulty
+      description: The tests are written for Normal. For a campaign battle, add the campaign difficulty and the turn under Result.
+      options:
+        - Easy
+        - Normal
+        - Hard
+        - Very Hard
+        - Not sure
   - type: textarea
     id: result
     attributes:
       label: Result
-      description: Who won, how much was left, how many tries. Several runs are better than one.
+      description: Always write this line yourself, even with a log attached. Who won, the winner's hit points left (the health bar as a share, and models left), the time, the map, whether the patch was on, and how many runs (three each way is the standard, see docs/TESTING.md). For auto-resolve, each unit's strength before and after, from the Battle Logger if you have it.
     validations:
       required: true
   - type: textarea
     id: battle_log
     attributes:
       label: Battle log (optional)
-      description: If you use the Battle Logger add-on, paste the contents of cbp_battle_log.txt from your game folder here, or drag the file in. Thank you, it helps a lot.
+      description: If you use the Battle Logger add-on, paste the contents of cbp_battle_log.txt from your game folder (in Steam, right-click the game, Manage, Browse local files) here. This box takes text only: to attach the whole file, drag it into the Notes box below. Thank you, it helps a lot.
       render: text
   - type: textarea
     id: notes

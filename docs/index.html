@@ -96,10 +96,12 @@ footer { margin-top: 22px; color: var(--muted); font-size: .92rem; text-align: c
     <section class="hidden" id="result">
       <div class="subtitle"><h2>Your Battles</h2></div>
       <div class="stats" id="stats"></div>
-      <div class="table-wrap"><table id="units"></table></div>
+      <div id="tables"></div>
       <p class="note" id="mods"></p>
       <button class="tw-button" id="send">Send my log</button>
-      <p class="note" id="sendnote">Opens a GitHub test report with your log already filled in. Pick the battle type, add anything you noticed, and press Submit. You need a free GitHub account.</p>
+      <p class="note" id="sendnote">Opens a GitHub test report with your log already filled in. Pick the battle type and unit size, add anything you noticed, and press Submit. You need a free GitHub account.</p>
+      <button class="tw-button" id="copy">Copy summary</button>
+      <p class="note" id="copynote">No GitHub account? This copies a short text summary of your battles. Paste it into a discussion on the mod's Steam Workshop page.</p>
     </section>
 
     <p class="note warn hidden" id="error"></p>
@@ -113,97 +115,284 @@ footer { margin-top: 22px; color: var(--muted); font-size: .92rem; text-align: c
 <script>
 (function () {
   var REPO = "https://github.com/Spiesky/community-balance-patch";
-  var MAX_LOG = 6000;           // characters of log that fit in the form link; longer logs keep the newest battles
+  var MAX_LOG = 6000;           // characters the log may take in the form link once encoded; longer logs keep the newest battles
+  var MAX_URL = 7500;           // the whole link; GitHub's own limit is not published, about 8000 is what is known to work
+  var TOP = 12;                 // rows shown per table
+  var PATCH = "community_balance_patch.pack", LOGGER = "community_balance_patch_battle_logger.pack", AR_TEST = "cbp_autoresolve";
   var drop = document.getElementById("drop"), input = document.getElementById("file");
-  var battles = [], raw = "";
+  var blocks = [], sum = null;
+  var SEND_NOTE = document.getElementById("sendnote").textContent, COPY_NOTE = document.getElementById("copynote").textContent;
+
+  // Tables keyed by text from the log (unit keys, pack names) have no prototype: a key like "constructor" is just a key.
+  function bag() { return Object.create(null); }
+  function plural(n, word) { return n + " " + word + (n === 1 ? "" : "s"); }
+
+  // The format is docs/LOG_FORMAT.md, versions 1 and 2. A value the game could not give is "?": num() makes it null.
+  function num(text) { return /^-?\d+(\.\d+)?$/.test(text || "") ? parseFloat(text) : null; }
 
   function parse(text) {
-    var out = [], cur = null;
-    text.split(/\r?\n/).forEach(function (line) {
+    var out = [], seen = bag(), cur = null;
+    text.split(/\r\n|\r|\n/).forEach(function (line) {
       line = line.trim();
-      if (line.indexOf("#battle;") === 0 || line.indexOf("#autoresolve;") === 0) {
-        var mods = (line.match(/mods=([^;]*)/) || [])[1] || "unknown";
-        cur = { head: line, mods: mods, units: [], lines: [line], auto: line.indexOf("#autoresolve;") === 0 };
-      } else if (cur && line.indexOf("u;") === 0) {
-        var f = line.split(";");
-        if (f.length >= 10) cur.units.push({ key: f[4], men: +f[5], alive: +f[6], kills: +f[7], routing: f[8] === "1", player: f[3] === "1" });
-        cur.lines.push(line);
-      } else if (cur && line.indexOf("a;") === 0) {
-        var g = line.split(";");                 // auto-resolve: strength in percent before and after
-        if (g.length >= 6) cur.units.push({ key: g[3], men: +g[4], alive: +g[5], kills: null, player: g[2] === "1" });
-        cur.lines.push(line);
-      } else if (cur && line === "#end") {
-        cur.lines.push(line); out.push(cur); cur = null;
+      var f = line.split(";");
+      if (line.indexOf("#error;") === 0 || line.indexOf("#debug;") === 0) return;       // diagnostics: never shown, never sent
+      if (/^#[a-z_]+;v\d+;/.test(line)) {                // a header; a block still open above it was cut short and is dropped
+        var name = f[0].slice(1), head = bag();
+        f.slice(3).forEach(function (p) { var i = p.indexOf("="); if (i > 0) head[p.slice(0, i)] = p.slice(i + 1); });
+        cur = { name: name, version: parseInt(f[1].slice(1), 10), head: head, units: [], lines: [line] };
+        cur.known = name === "battle" || name === "result" || name === "autoresolve";
+        cur.mode = name === "battle" ? "fought" : name === "autoresolve" ? "auto" : head.mode === "auto" ? "auto" : "result";
+        return;
       }
+      if (!cur) return;
+      if (line === "#end") {
+        cur.lines.push(line);
+        var id = cur.lines.join("\n");
+        if (cur.known && !seen[id]) { seen[id] = 1; out.push(cur); }                    // the same block twice counts once
+        cur = null;
+      } else if (cur.name === "battle" && f[0] === "u" && f.length >= 10) {
+        cur.units.push({ key: f[4], player: f[3] === "1", men: num(f[5]), alive: num(f[6]), kills: num(f[7]), hp: num(f[10]) });
+        cur.lines.push(line);
+      } else if (cur.name === "result" && f[0] === "r" && f.length >= 7) {
+        cur.units.push({ key: f[4], player: f[3] === "1", before: num(f[5]), after: num(f[6]) });
+        cur.lines.push(line);
+      } else if (cur.name === "autoresolve" && f[0] === "a" && f.length >= 6) {
+        cur.units.push({ key: f[3], player: f[2] === "1", before: num(f[4]), after: num(f[5]) });
+        cur.lines.push(line);
+      }
+    });
+    // A fought #result describes the campaign #battle written just before it: the two are one battle.
+    out.forEach(function (b, i) {
+      var next = out[i + 1];
+      if (b.name === "battle" && b.head.campaign === "1" && next && next.mode === "result") { b.result = next; next.paired = true; }
     });
     return out;
   }
 
+  // Which mods a battle had, per the table at the end of docs/LOG_FORMAT.md
+  function classify(b) {
+    var raw = b.head.mods, known = !!raw && raw !== "unknown" && raw !== "?";
+    var packs = known ? raw.split("|").map(function (p) { return p.trim().toLowerCase(); }).filter(function (p) { return p && p !== "none"; }) : [];
+    var cbp = b.head.cbp, hasVersion = !!cbp && cbp !== "?" && cbp !== "none";
+    return {
+      patched: hasVersion || packs.indexOf(PATCH) >= 0,
+      version: hasVersion ? cbp : null,
+      arRules: packs.some(function (p) { return p.indexOf(AR_TEST) === 0; }),
+      others: packs.filter(function (p) { return p !== PATCH && p !== LOGGER && p.indexOf(AR_TEST) !== 0; }),
+      known: known
+    };
+  }
+
+  function add(table, key, value, kills) {
+    var s = table[key] || (table[key] = { n: 0, lost: 0, kn: 0, kills: 0 });
+    s.n++; s.lost += Math.min(1, Math.max(0, value));
+    if (kills !== null && kills !== undefined) { s.kn++; s.kills += kills; }
+  }
+
+  // Everything the page shows, worked out once. Units with a missing number are skipped. Only the player's side:
+  // in a fought battle the logger flags the whole alliance, so an allied army that joined is counted too.
+  function summarise(list) {
+    var r = { fought: 0, auto: 0, resultsOnly: 0, patched: 0, versions: bag(), noVersion: 0, vanilla: 0, arRules: 0, others: bag(), unknownMods: 0,
+              difficulty: bag(), hp: bag(), models: bag(), strength: bag(), units: bag() };
+    list.forEach(function (b) {
+      var c = classify(b);
+      if (b.mode === "result") {                         // the campaign's view of a fought battle: sent, but not a second battle
+        if (b.head.difficulty) r.difficulty[b.head.difficulty] = 1;
+        if (!b.paired) r.resultsOnly++;                  // its #battle block is not in the file
+        return;
+      }
+      if (b.mode === "auto") r.auto++; else r.fought++;
+      if (b.head.difficulty) r.difficulty[b.head.difficulty] = 1;
+      if (c.patched) { r.patched++; if (c.version) r.versions[c.version] = 1; else r.noVersion++; } else if (c.known || b.head.cbp === "none") r.vanilla++;
+      if (c.arRules) r.arRules++;
+      if (!c.known) r.unknownMods++;
+      c.others.forEach(function (m) { r.others[m] = 1; });
+      b.units.forEach(function (u) {
+        if (!u.player) return;
+        if (b.mode === "auto") {
+          if (u.before === null || u.after === null || u.before <= 0) return;
+          add(r.strength, u.key, (u.before - u.after) / u.before); r.units[u.key] = 1;
+        } else if (b.version >= 2) {
+          if (u.hp === null) return;
+          add(r.hp, u.key, 1 - u.hp, u.kills); r.units[u.key] = 1;
+        } else {
+          if (u.men === null || u.alive === null || u.men <= 0) return;
+          add(r.models, u.key, (u.men - u.alive) / u.men, u.kills); r.units[u.key] = 1;
+        }
+      });
+    });
+    return r;
+  }
+
+  function shortName(key) { return key.replace(/^wh\d?_(main|dlc\d+|pro\d+|twa\d+)_/, ""); }
+  function percent(s) { return Math.round(100 * s.lost / s.n) + "%"; }
+  function kills(s) { return s.kn ? (s.kills / s.kn).toFixed(1) : "-"; }
+  function rows(table) { return Object.keys(table).sort(function (a, b) { return table[b].n - table[a].n || (a < b ? -1 : 1); }); }
+  function names(set) { return Object.keys(set).sort().join(", "); }
+
+  function versionText(r) {
+    var parts = Object.keys(r.versions).sort();
+    if (r.noVersion) parts.push("patch (version not in the log)");
+    if (r.vanilla) parts.push("vanilla");
+    return parts.join(", ");
+  }
+
   function el(tag, text, cls) { var e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (cls) e.className = cls; return e; }
 
+  function addTable(title, heads, table, withKills) {
+    var keys = rows(table);
+    if (!keys.length) return;
+    var box = document.getElementById("tables");
+    box.appendChild(el("p", title + (keys.length > TOP ? " (the " + TOP + " you used most)" : ""), "note"));
+    var wrap = el("div", undefined, "table-wrap"), t = el("table"), hr = el("tr");
+    heads.forEach(function (h, i) { hr.appendChild(el("th", h, i ? "num" : "")); }); t.appendChild(hr);
+    keys.slice(0, TOP).forEach(function (k) {
+      var s = table[k], tr = el("tr");
+      tr.appendChild(el("td", shortName(k)));
+      tr.appendChild(el("td", String(s.n), "num"));
+      tr.appendChild(el("td", percent(s), "num"));
+      if (withKills) tr.appendChild(el("td", kills(s), "num"));
+      t.appendChild(tr);
+    });
+    wrap.appendChild(t); box.appendChild(wrap);
+  }
+
   function show(text) {
-    raw = text; battles = parse(text);
+    blocks = parse(text); sum = summarise(blocks);
     var err = document.getElementById("error");
-    if (!battles.length) {
+    if (!blocks.length) {
       err.textContent = "No battles found in that file. Is it cbp_battle_log.txt from the Battle Logger?";
       err.classList.remove("hidden"); document.getElementById("result").classList.add("hidden"); return;
     }
     err.classList.add("hidden");
-    var patched = battles.filter(function (b) { return b.mods.indexOf("community_balance_patch.pack") >= 0; }).length;
-    var per = {};
-    battles.forEach(function (b) { b.units.forEach(function (u) {
-      var s = per[u.key] || (per[u.key] = { n: 0, men: 0, lost: 0, kills: 0, klost: 0 });
-      s.n++; s.men += u.men; s.lost += Math.max(0, u.men - u.alive);
-      if (u.kills !== null) { s.kills += u.kills; s.klost += Math.max(0, u.men - u.alive); }
-    }); });
+    var sendnote = document.getElementById("sendnote"); sendnote.textContent = SEND_NOTE; sendnote.classList.remove("warn");
+    var old = document.getElementById("summary"); if (old) old.remove();                // the summary of the file before
+    document.getElementById("copynote").textContent = COPY_NOTE;
+    var versions = Object.keys(sum.versions);
+    var patchLabel = versions.length === 1 && !sum.noVersion ? "with patch " + versions[0] : "with the patch";
     var stats = document.getElementById("stats"); stats.innerHTML = "";
-    [[battles.filter(function (b) { return !b.auto; }).length, "fought"], [battles.filter(function (b) { return b.auto; }).length, "auto-resolved"], [patched, "with the patch"], [Object.keys(per).length, "units"]].forEach(function (s) {
-      var d = el("div", undefined, "stat"); d.appendChild(el("b", String(s[0]))); d.appendChild(el("small", s[1])); stats.appendChild(d);
-    });
-    var t = document.getElementById("units"); t.innerHTML = "";
-    var hr = el("tr"); ["Unit", "Fights", "Lost", "Kills / loss"].forEach(function (h, i) { hr.appendChild(el("th", h, i ? "num" : "")); }); t.appendChild(hr);
-    Object.keys(per).sort(function (a, b) { return per[b].n - per[a].n; }).slice(0, 12).forEach(function (k) {
-      var s = per[k], r = el("tr");
-      r.appendChild(el("td", k.replace(/^wh\d?_(main|dlc\d+|pro\d+|twa\d+)_/, "")));
-      r.appendChild(el("td", String(s.n), "num"));
-      r.appendChild(el("td", Math.round(100 * s.lost / Math.max(1, s.men)) + "%", "num"));
-      r.appendChild(el("td", s.klost || s.kills ? (s.kills / Math.max(1, s.klost)).toFixed(1) : "-", "num"));
-      t.appendChild(r);
-    });
-    var mods = {}; battles.forEach(function (b) { b.mods.split("|").forEach(function (m) { if (m) mods[m] = 1; }); });
-    document.getElementById("mods").textContent = "Mods seen in your battles (pack names only): " + Object.keys(mods).join(", ");
+    document.getElementById("tables").innerHTML = "";
+    if (sum.fought + sum.auto) {
+      [[sum.fought, "fought"], [sum.auto, "auto-resolved"], [sum.patched, patchLabel], [Object.keys(sum.units).length, "units on your side"]].forEach(function (s) {
+        var d = el("div", undefined, "stat"); d.appendChild(el("b", String(s[0]))); d.appendChild(el("small", s[1])); stats.appendChild(d);
+      });
+    } else {
+      document.getElementById("tables").appendChild(el("p", "Only campaign results were found, no battle details (" + plural(sum.resultsOnly, "result") + "). You can still send the log.", "note"));
+    }
+    addTable("Battles you fought: units on your side (an allied army counts too)", ["Unit", "Fights", "HP lost", "Kills"], sum.hp, true);
+    addTable("Battles you fought, older logger (it counted models, not hit points)", ["Unit", "Fights", "Models lost", "Kills"], sum.models, true);
+    addTable("Auto-resolved battles: your units", ["Unit", "Battles", "Strength lost"], sum.strength, false);
+    var mods = "Patch: " + (versionText(sum) || "not in the log") + ".";
+    if (sum.arRules) mods += " Auto-resolve test pack loaded in " + plural(sum.arRules, "battle") + ".";
+    mods += " Other mods (pack names only): " + (names(sum.others) || "none") + ".";
+    if (sum.unknownMods) mods += " The mod list could not be read in " + plural(sum.unknownMods, "battle") + ".";
+    document.getElementById("mods").textContent = mods;
     document.getElementById("result").classList.remove("hidden");
   }
 
-  function logForLink() {
-    var kept = [], size = 0;
-    for (var i = battles.length - 1; i >= 0; i--) {
-      var block = battles[i].lines.join("\n");
-      if (size + block.length + 1 > MAX_LOG) break;
-      kept.unshift(block); size += block.length + 1;
+  // The size of a text inside the link, measured with the encoder that builds the link (it also encodes ! ' ( ) ~).
+  function cost(text) { return new URLSearchParams({ b: text }).toString().length - 2; }
+
+  // The log as battles, oldest first: a campaign #battle and the #result after it are one battle.
+  function battles() {
+    var items = [];
+    blocks.forEach(function (b) {
+      if (b.paired) return;                              // sent with its #battle
+      items.push({ main: b.lines.join("\n"), extra: b.result ? b.result.lines.join("\n") : null });
+    });
+    return items;
+  }
+
+  // The newest battles that fit in the link. When a battle and its campaign result do not both fit, the #battle block
+  // is kept (it has the hit points) and the result is left out.
+  function logForLink(items) {
+    var kept = [], size = 0, cut = false;
+    for (var i = items.length - 1; i >= 0; i--) {
+      var it = items[i], full = it.extra ? it.main + "\n" + it.extra : it.main;
+      var c = cost(full + "\n"), alone = cost(it.main + "\n");
+      if (size + c <= MAX_LOG) { kept.unshift(full); size += c; }
+      else if (it.extra && size + alone <= MAX_LOG) { kept.unshift(it.main); size += alone; cut = true; }
+      else break;
     }
-    return { text: kept.join("\n"), count: kept.length };
+    return { kept: kept, cut: cut };
+  }
+
+  function summaryText() {
+    var out = ["Community Balance Patch battle log summary",
+      "Battles: " + sum.fought + " fought, " + sum.auto + " auto-resolved. Patch: " + (versionText(sum) || "not in the log") + ". Unit size: unknown (the log does not record it)."];
+    function section(title, table, withKills) {
+      var keys = rows(table);
+      if (!keys.length) return;
+      out.push(title);
+      keys.slice(0, 30).forEach(function (k) {
+        var s = table[k];
+        out.push("  " + shortName(k) + ": " + s.n + ", " + percent(s) + (withKills ? ", " + kills(s) : ""));
+      });
+    }
+    section("Fought, units on my side (fights, HP lost, kills per fight):", sum.hp, true);
+    section("Fought, older logger, units on my side (fights, models lost, kills per fight):", sum.models, true);
+    section("Auto-resolved, my units (battles, strength lost):", sum.strength, false);
+    if (!(sum.fought + sum.auto)) out.push("Only campaign results in the log, no battle details (" + plural(sum.resultsOnly, "result") + ").");
+    if (sum.arRules) out.push("Auto-resolve test pack loaded in " + plural(sum.arRules, "battle") + ".");
+    out.push("Other mods: " + (names(sum.others) || "none") + (sum.unknownMods ? " (mod list unreadable in " + plural(sum.unknownMods, "battle") + ")" : ""));
+    return out.join("\n");
+  }
+
+  document.getElementById("copy").addEventListener("click", function () {
+    var text = summaryText(), note = document.getElementById("copynote");
+    function done(ok) {
+      note.textContent = ok ? "Copied. Paste it into a discussion on the mod's Steam Workshop page. Thank you!"
+        : "Your browser did not allow copying. Select the text below and copy it by hand.";
+      var old = document.getElementById("summary"); if (old) old.remove();
+      if (!ok) { var pre = el("textarea", text); pre.id = "summary"; pre.rows = 10; pre.readOnly = true; pre.style.width = "100%"; note.parentNode.insertBefore(pre, note.nextSibling); pre.select(); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+    else done(false);
+  });
+
+  // The link to the prefilled report for the battles kept (their texts, oldest first) out of total
+  function reportLink(kept, total, cut) {
+    var drag = "please drag cbp_battle_log.txt into the Notes box at the bottom of the form.";
+    // the form's Result field is the tester's own line; the page cannot know who won a duel
+    var result = "(Write your result here: what fought what, who won, hit points left, time, unit size, battle difficulty, map. Or write: log only.)\n\n";
+    if (!kept.length) result += "The newest battle is too long for the link: " + drag + " ";
+    result += sum.fought + " fought and " + sum.auto + " auto-resolved battles logged by the Battle Logger."
+      + (sum.resultsOnly ? " " + plural(sum.resultsOnly, "campaign result") + " without battle details." : "")
+      + " Unit size: unknown (the log does not record it)."
+      + (names(sum.difficulty) ? " Campaign difficulty in the log: " + names(sum.difficulty) + "." : "");
+    if (kept.length && kept.length < total) result += " The log below has the newest " + kept.length + " of " + plural(total, "battle") + "; " + drag;
+    else if (kept.length && cut) result += " The campaign results of some battles did not fit in the link; " + drag;
+    var params = new URLSearchParams({
+      template: "test_report.yml",
+      title: "[Test] Battle log: " + plural(total, "battle"),
+      version: (versionText(sum) || "not in the log") + " (from the Battle Logger)",
+      unit: "see the battle log",
+      opponent: "see the battle log",
+      result: result,
+      battle_log: kept.join("\n")
+    });
+    return REPO + "/issues/new?" + params.toString();
   }
 
   document.getElementById("send").addEventListener("click", function () {
-    var log = logForLink();
-    var patched = battles.some(function (b) { return b.mods.indexOf("community_balance_patch.pack") >= 0; });
-    var params = new URLSearchParams({
-      template: "test_report.yml",
-      title: "[Test] Battle log: " + battles.length + " battles",
-      version: patched ? "beta (from the Battle Logger)" : "vanilla (from the Battle Logger)",
-      unit: "see the battle log",
-      opponent: "see the battle log",
-      result: battles.length + " battles logged by the Battle Logger." + (log.count < battles.length ? " The log below has the newest " + log.count + "; the full file is attached." : ""),
-      battle_log: log.text
-    });
+    var items = battles(), total = items.length, log = logForLink(items), kept = log.kept;
+    var url = reportLink(kept, total, log.cut);
+    while (url.length > MAX_URL && kept.length) {       // the other fields take room too: drop the oldest battle kept
+      kept = kept.slice(1);
+      url = reportLink(kept, total, log.cut);
+    }
     var note = document.getElementById("sendnote");
-    if (log.count < battles.length) {
-      note.innerHTML = "";
-      note.appendChild(document.createTextNode("Your log is long, so the form gets your newest " + log.count + " battles. To send all of them, drag cbp_battle_log.txt into the Battle log box on GitHub as well."));
+    if (!kept.length) {
+      note.textContent = "Your newest battle is too long for the link, so the form opens without your log. On GitHub, drag cbp_battle_log.txt into the Notes box at the bottom of the form before you press Submit.";
+      note.classList.add("warn");
+    } else if (kept.length < total) {
+      note.textContent = "Your log is long, so the form gets your newest battles (" + kept.length + " of " + total + "). To send all of them, drag cbp_battle_log.txt into the Notes box at the bottom of the GitHub form as well.";
+      note.classList.add("warn");
+    } else if (log.cut) {
+      note.textContent = "Your log is long, so part of it was left out of the form. To send all of it, drag cbp_battle_log.txt into the Notes box at the bottom of the GitHub form as well.";
       note.classList.add("warn");
     }
-    window.open(REPO + "/issues/new?" + params.toString(), "_blank", "noopener");
+    window.open(url, "_blank", "noopener");
   });
 
   function read(file) { if (!file) return; var r = new FileReader(); r.onload = function () { show(String(r.result)); }; r.readAsText(file); }

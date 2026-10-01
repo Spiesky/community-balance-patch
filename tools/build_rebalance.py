@@ -2,13 +2,18 @@
 """Build the rebalance pack from the solver's proposals.
 
     python3 rebalance_survey.py && python3 rebalance_solve.py && python3 build_rebalance.py
-                                                            -> ../build/community_balance_patch.pack
+                                                            -> ../build/draft/community_balance_patch_DRAFT.pack
+
+That is the whole draft, for study. The Workshop pack is the beta: tools/patch_day.sh builds it (CBP_PROPOSALS=_beta.json,
+CBP_COMMUNITY=1, CBP_OUT=../build/beta/community_balance_patch.pack). The draft carries a different file name so it
+cannot be uploaded by mistake.
 
 What goes in, per changed unit (from _rebalance.json, written by rebalance_solve.py):
 
   land_units      melee_attack, melee_defence and bonus_hit_points moved by the proposal's delta against the vanilla
                   row (never the model's absolute figure: the model folds permanent passives in), num_mounts where the
-                  unit size changes, morale / charge_bonus / armour for the decided four, primary_melee_weapon and
+                  unit size changes, charge_bonus for the lore elites (it scales with their damage), morale / charge_bonus
+                  / armour for the decided four, primary_ammo for the gunpowder rule, primary_melee_weapon and
                   primary_missile_weapon pointed at the land unit's own copies where damage moves. A land unit shared
                   by several main units is written once, and only if every sharer agrees.
   melee_weapons   a copy of the unit's weapon under the land unit's key with damage, AP, bonus vs large and vs infantry
@@ -18,8 +23,12 @@ What goes in, per changed unit (from _rebalance.json, written by rebalance_solve
                   unit's alternate ammunition (unit_missile_weapon_junctions) is copied and scaled the same way, with
                   the vanilla junction row overridden by its id
   main_units      multiplayer_cost, recruitment_cost (0 stays 0: Tomb Kings pay in other ways), upkeep_cost, num_men
+  text            one localisation entry, cbp_version = the VERSION file, so the Battle Logger (a separate pack) can
+                  write down which build a battle was fought with. The pack's name never changes: renaming it would
+                  switch the mod off for every subscriber.
 
-The decided units (decided.STATS) are written from STATS as they are.
+The decided units (decided.STATS) are written from STATS as they are. The auto-resolve rules (autoresolve_rules.py) are
+NOT part of the patch: they build as their own test pack, and only CBP_AUTORESOLVE=1 puts them in here.
 The pack stands on its own. Check it with refcheck.py and rebalance_check.py, and read docs/METHOD.md before
 trusting any number in it.
 """
@@ -29,13 +38,17 @@ import sys
 
 import vanilla as V
 import gamever
+import gunpowder as GP
 import packwrite
 from decided import STATS, coerce
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.environ.get("CBP_OUT", os.path.join(os.path.dirname(HERE), "build", "community_balance_patch.pack"))
+OUT = os.environ.get("CBP_OUT", os.path.join(os.path.dirname(HERE), "build", "draft", "community_balance_patch_DRAFT.pack"))
 PROPOSALS = os.environ.get("CBP_PROPOSALS") or os.path.join(HERE, "_rebalance.json")
 COMMUNITY = os.environ.get("CBP_COMMUNITY") == "1"   # apply the community's own list (community.py) on top
+AUTORESOLVE = os.environ.get("CBP_AUTORESOLVE") == "1"   # also carry the auto-resolve test rules (off: they are a test pack)
+VERSION = open(os.path.join(os.path.dirname(HERE), "VERSION")).read().strip()
+VERSION_KEY = "cbp_version"                          # the Battle Logger reads this localisation key
 YIELD_TO_BUGFIX = {"wh3_dlc25_dwf_inf_slayer_pirates", "wh3_dlc25_dwf_inf_slayer_pirates_ror"}   # its animation fix
 PREFIX = "gr_"                     # the great rebalance's own keys
 
@@ -66,7 +79,10 @@ def main():
     # damage figure by the proposal's factor k.
     def deltas(o):
         a, b = o["after"], o["before"]
+        # the charge bonus moves only for the lore elites, and as a factor: the card's figure has passives folded in
+        # (Frenzy multiplies it), so a difference written onto the database value would count the passive twice
         return dict(k=o.get("k") or 1.0, dma=round(a["ma"] - b["ma"]), dmd=round(a["md"] - b["md"]), dhp=round(a["hp"] - b["hp"]),
+                    cbx=round(a["cb"] / b["cb"], 4) if b["cb"] and abs(a["cb"] - b["cb"]) > 1e-9 else 1.0, gun=bool(o.get("gun")),
                     men=(a["men"] if a["men"] != b["men"] else None), missile=bool(a.get("missile") and b.get("missile")))
 
     # Some main units share one land_units row (the Ghorgon and Khorne's, Throgg's trolls and Chaos's). The row is
@@ -120,6 +136,9 @@ def main():
             if d["dhp"]:
                 lu["bonus_hit_points"] = str(max(0, int(float(lu["bonus_hit_points"])) + d["dhp"]))
                 touched = True
+            if d["cbx"] != 1.0:                           # the lore elites only: charge scales with their damage
+                lu["charge_bonus"] = str(int(round(float(lu["charge_bonus"]) * d["cbx"])))
+                touched = True
             if d["men"]:
                 mu["num_men"] = str(int(d["men"]))
                 if int(float(lu["num_mounts"])) == b["men"]:
@@ -145,6 +164,8 @@ def main():
                 for col in ("damage", "ap_damage", "bonus_v_large", "bonus_v_infantry"):
                     p[col] = str(int(round(float(p[col] or 0) * k * gun_d)))
                 p["base_reload_time"] = str(round(float(p["base_reload_time"]) * gun_r, 2))
+                if o.get("gun"):                          # less ammunition: the same damage over a battle as vanilla
+                    lu["primary_ammo"] = str(GP.ammo(lu["primary_ammo"]))
                 mw = dict(vmw)
                 mw["key"], mw["default_projectile"] = PREFIX + lukey, p["key"]
                 if first_for_land:
@@ -189,14 +210,37 @@ def main():
         import unit_model as UM
         out = dict(land_units={r["key"]: r for r in land}, main_units={r["unit"]: r for r in main_rows},
                    melee_weapons={r["key"]: r for r in weapons}, projectiles={r["key"]: r for r in projectiles},
-                   missile_weapons={r["key"]: r for r in missiles})
+                   missile_weapons={r["key"]: r for r in missiles},
+                   unit_missile_weapon_junctions={str(r["id"]): r for r in junctions})
         skip = {o["key"]: "lore elite, set by the patch's own design" for o in props if o.get("elite")}
-        clog = community.apply(out, V, coerce, UM.name, UM.faction, UM.recruitable(), skip)
+        guns = {MU[o["key"]]["land_unit"]: tuple(o["gun"]) for o in props if o.get("gun")}
+        clog = community.apply(out, V, coerce, UM.name, UM.faction, UM.recruitable(), skip, guns)
         land, main_rows = list(out["land_units"].values()), list(out["main_units"].values())
         weapons, projectiles, missiles = list(out["melee_weapons"].values()), list(out["projectiles"].values()), list(out["missile_weapons"].values())
+        junctions = list(out["unit_missile_weapon_junctions"].values())
         entities = list(out.get("battle_entities", {}).values())
         print("   community list: %d changes, %d land units, %d entities" % (len(clog), len(land), len(entities)))
+        os.makedirs(os.path.dirname(OUT), exist_ok=True)
         json.dump([[l, k, c] for l, k, c in clog], open(os.path.join(os.path.dirname(OUT), "community_log.json"), "w"), indent=0)
+    # Campaign copies. Some main units share another's land unit under a campaign-only key (an Imperial Supply
+    # Handgunner, Dechala's Daemonettes): they get the stats through the shared row, so when the price of the unit they
+    # copy moves, theirs moves by the same ratio (a campaign cost or upkeep of 0 stays 0).
+    written = {r["unit"]: r for r in main_rows}
+    for r in list(main_rows):
+        v = MU[r["unit"]]
+        old, new = int(float(v["multiplayer_cost"])), int(r["multiplayer_cost"])
+        if not old or new == old:
+            continue
+        for s in (m for m in MU.values() if m["land_unit"] == v["land_unit"] and m["unit"] not in written
+                  and int(float(m["multiplayer_cost"])) == old):
+            t = dict(s)
+            t["multiplayer_cost"] = str(new)
+            t["recruitment_cost"] = str(int(round(float(s["recruitment_cost"]) * new / old / 25.0)) * 25)
+            t["upkeep_cost"] = str(int(round(float(s["upkeep_cost"]) * new / old)))
+            row = coerce("main_units", t)
+            main_rows.append(row)
+            written[s["unit"]] = row
+            counts["copies"] = counts.get("copies", 0) + 1
     # rows the Community Bug Fix Mod also fixes go in a file that sorts after its "zzz_cbfm_*" files: with it installed its
     # fix wins, without it ours applies (checked against its pack of 2026-09-27, Game v9 Batch 1)
     yielded = [r for r in land if r["key"] in YIELD_TO_BUGFIX]
@@ -214,12 +258,19 @@ def main():
         entries.append(("db/land_units_tables/zzzz_community_balance_patch_after_bugfix", packwrite.build_db("land_units_tables", gamever.ver("land_units"), yielded)))
     if COMMUNITY and entities:
         entries.append(("db/battle_entities_tables/!community_balance_patch", packwrite.build_db("battle_entities_tables", gamever.ver("battle_entities"), entities)))
-    import autoresolve_rules                   # fairer auto-resolve ships in the patch
-    entries += autoresolve_rules.entries()[0]
+    if not only:                               # the build's version, for the Battle Logger (a data row, not a script)
+        entries.append(("text/db/community_balance_patch.loc", packwrite.build_loc([(VERSION_KEY, VERSION)])))
+    if AUTORESOLVE:                            # the auto-resolve test rules: their own pack unless asked for here
+        import autoresolve_rules
+        ar, (nt, nm, nl) = autoresolve_rules.entries()
+        entries += ar
+        print("   auto-resolve rules INCLUDED (CBP_AUTORESOLVE=1): %s" % autoresolve_rules.describe())
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     open(OUT, "wb").write(packwrite.build_pack(entries))
-    print("written: %s  %d bytes" % (OUT, os.path.getsize(OUT)))
+    print("written: %s  %d bytes, version %s" % (OUT, os.path.getsize(OUT), VERSION))
     print("   %(units)d units; %(weapons)d weapon copies, %(projectiles)d projectile copies (+%(alternates)d alternate ammunition), %(resized)d resized, %(priced)d repriced; %(held)d held for review (--include-review writes them)" % counts)
+    if counts.get("copies"):
+        print("   %d campaign copies repriced with the unit they copy" % counts["copies"])
 
 
 if __name__ == "__main__":

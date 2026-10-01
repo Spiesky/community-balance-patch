@@ -48,15 +48,16 @@ body:
     id: proposal
     attributes:
       label: What would you change?
-      description: Exact numbers if you have them (e.g. "+4 melee attack, -25 gold"). A suggestion needs exact numbers and a sponsor to go to a vote, but "I don't know, but it's off" is still worth posting; someone may pick it up.
+      description: Exact numbers if you have them (e.g. "+4 melee attack, -25 gold"). With exact numbers it can be built and posted for the one-week objection window (docs/HOW_DECISIONS_ARE_MADE.md). "I don't know, but it's off" is still worth posting; someone may pick it up.
   - type: textarea
     id: evidence
     attributes:
       label: Evidence
-      description: Test results, replays, screenshots, lore sources, links.
+      description: Test results (docs/TESTING.md has the recipe), replays, screenshots, lore sources, links.
   - type: checkboxes
     id: sponsor
     attributes:
       label: Sponsor
+      description: You don't build anything. A sponsor is a tester (docs/TESTING.md has the recipe).
       options:
-        - label: I'll build and test this myself if it wins the vote (see docs/HOW_DECISIONS_ARE_MADE.md)
+        - label: I'll test this in game and post the result

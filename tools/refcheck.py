@@ -19,7 +19,7 @@ from packread import Pack
 from dbread import decode, load_refs
 import vanilla
 
-PACK = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "build", "community_balance_patch.pack")
+PACK = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "build", "draft", "community_balance_patch_DRAFT.pack")
 # required mods whose keys count as valid targets: python3 refcheck.py <pack> <required pack> ...
 REQUIRED = sys.argv[2:]
 
@@ -57,8 +57,20 @@ def main():
 
     # Which (table, column) pairs does anything we ship point at?
     wanted = set()
+    def refs_of(t):
+        """the table's foreign keys at the pack's version; if the schema does not know that version (it is read
+        through schema_patch.json), the newest version it does know, for the columns the rows still have"""
+        known = load_refs(t + "_tables")
+        if vers[t] in known or not known:
+            return known.get(vers[t], {}), False
+        cols = set(rows[t][0]) if rows[t] else set()
+        return {f: ref for f, ref in known[max(known)].items() if f in cols}, True
+
+    borrowed = sorted(t for t in rows if refs_of(t)[1])
+    if borrowed:
+        print("references borrowed from an older schema version for: %s\n" % ", ".join(borrowed))
     for t in rows:
-        for f, (rt, rc) in load_refs(t + "_tables").get(vers[t], {}).items():
+        for f, (rt, rc) in refs_of(t)[0].items():
             wanted.add((rt, rc))
 
     # Build the universe of valid keys for each of those: vanilla plus the pack.
@@ -80,7 +92,7 @@ def main():
 
     dangling, checked = {}, 0
     for t in sorted(rows):
-        refs = load_refs(t + "_tables").get(vers[t], {})
+        refs = refs_of(t)[0]
         if not refs:
             continue
         for r in rows[t]:

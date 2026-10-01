@@ -46,7 +46,7 @@ ROOT = os.path.dirname(HERE)
 SURVEY = os.path.join(HERE, "_survey.json")
 OUT_MD = os.path.join(ROOT, "reports", "proposals.md")
 OUT_JSON = os.path.join(HERE, "_rebalance.json")
-BETA_JSON = os.path.join(HERE, "_beta.json")   # what the beta ships: the lore elites and the gunpowder rule only
+BETA_JSON = os.path.join(HERE, "_beta.json")   # what the beta ships (make_beta): the themes, not the whole draft
 
 # Close to vanilla: the patch adjusts CA's balance so it makes more sense, it does not replace it.
 RESIZE = False              # unit sizes stay vanilla (the ladder's sizes are community questions, e.g. units/blood_knights.md)
@@ -58,8 +58,16 @@ FLAT_CASTES_MOVE = False    # monsters, war beasts, chariots, war machines stay 
 # The exception: the lore's elite cavalry are fewer and far stronger than vanilla makes them. They take the lore's size
 # and strength in full, never end up with less total health than vanilla, and their price follows their power (within
 # ELITE_PRICE_CAP). Everything else stays close to vanilla.
-ELITE = re.compile(r"vmp_blood_knights|vmp_cav_blood_knights|brt_cav_grail_knights|brt_cav_grail_guardians|chs_cav_chaos_knights_ror_0")
+ELITE_FAMILIES = {            # units CA prices together: they move by one price ratio (elite_family_prices)
+    "Blood Knights": r"vmp_blood_knights|vmp_cav_blood_knights",
+    "Grail Knights and Guardians": r"brt_cav_grail_knights|brt_cav_grail_guardians",   # both 1850 in vanilla
+    "Swords of Chaos": r"chs_cav_chaos_knights_ror_0",
+}
+ELITE = re.compile("|".join(ELITE_FAMILIES.values()))
 ELITE_PRICE_CAP = math.log(1.6)
+# The beta's second theme, elite infantry worth its price: melee infantry the ladder rates elite or champion, and the
+# units below, which are their roster's elite infantry although the ladder's absolute scale calls them veteran.
+THEME_ALSO = re.compile(r"emp_inf_greatswords")
 
 TOLERANCE = 0.15            # |residual| inside this band (one robust sigma): the unit is fine, nothing moves
 CAP = POWER_LIMIT           # the most a unit's regiment power moves through the price layer
@@ -260,8 +268,14 @@ def propose(key):
                 k = c["men"] / v["men"]
                 v = scaled(base, k)
             v = rounded(v, c)
+            if elite and k > 1.0:
+                # a lore elite's damage more than doubles; its charge scales with it, so the charge stays what it was
+                # next to the unit's own blows (otherwise 24 riders would charge like 24 vanilla riders)
+                v["cb"] = float(round(c["cb"] * k))
             p1 = UM.regiment_power(v)
         move = math.log(p1 / x["power_reg"])
+        # what the unit can actually spend: overkill taken out (a blow never does more than its target has hit points)
+        usable = UM.usable_power(v) / UM.usable_power(c) if elite and not L["price_only"] else p1 / x["power_reg"]
         res = x["residual"] if x["residual"] is not None else 0.0
         if abs(move) < 0.02 and abs(res) <= TOLERANCE and v["men"] == c["men"]:
             out["after"] = snapshot(c); out["after"]["power_reg"] = x["power_reg"]
@@ -275,13 +289,14 @@ def propose(key):
         if L.get("hold_price"):
             price_move = 0.0
         elif x["caste"] in STAT_CASTES:
-            want = fair_log_cost(xx, p1) - math.log(max(1.0, x["cost"])) if x["cost"] else 0.0
+            # an elite is valued on its usable power: damage it cannot spend is not charged for
+            want = fair_log_cost(xx, x["power_reg"] * usable if elite else p1) - math.log(max(1.0, x["cost"])) if x["cost"] else 0.0
             cap = ELITE_PRICE_CAP if elite else LORE_PRICE_CAP
             price_move = max(-cap, min(cap, want))
             if not L["price_only"]:                    # a stronger unit never gets cheaper, a weaker one never dearer
                 price_move = max(0.0, price_move) if move >= 0 else min(0.0, price_move)
-            if elite and move > 0:                     # the price never rises faster than the power
-                price_move = min(price_move, move)
+            if elite and move > 0:                     # the price never rises faster than the (usable) power
+                price_move = min(price_move, math.log(usable))
         else:
             # flat-priced castes: the price follows the power along the caste's line and the residual is corrected
             # up to the cap, as before, but the result is never above vanilla (docs/COMMUNITY_RESEARCH.md): a Bloodthirster
@@ -293,6 +308,8 @@ def propose(key):
         out.update(action="lore", note="%s: %s. %s" % (L["tier"], how, L["note"]), after=snapshot(v), k=k,
                    drift=UM.identity_drift(c, v) if k != 1.0 else 0.0, lore=True, elite=elite)
         out["after"]["power_reg"] = p1
+        if elite:
+            out["usable"] = usable
         out.update(new_cost=new_cost, new_campaign_cost=(price_round(x["campaign_cost"] * new_cost / x["cost"]) if x["campaign_cost"] and x["cost"] else x["campaign_cost"]),
                    new_upkeep=int(round(x["upkeep"] * new_cost / x["cost"])) if x["cost"] else x["upkeep"])
         return out
@@ -351,7 +368,8 @@ def snapshot(c):
              morale=c["morale"], base=c["base"], ap=c["ap"], bvl=c["bvl"], bvi=c["bvi"])
     if c.get("missile"):
         m = c["missile"]
-        s["missile"] = dict(base=m["base"], ap=m["ap"], bvl=m["bvl"], bvi=m["bvi"], key=m["key"], projectile=m["projectile"])
+        s["missile"] = dict(base=m["base"], ap=m["ap"], bvl=m["bvl"], bvi=m["bvi"], key=m["key"], projectile=m["projectile"],
+                            reload=m["reload"], ammo=m["ammo"])
     return s
 
 
@@ -439,14 +457,16 @@ def follow_bases(props):
         ratio = b["after"]["power_reg"] / b["power_reg"]
         price_ratio = (b["new_cost"] / b["cost"]) if b["cost"] else 1.0
         c = UM.card(o["key"])
-        v, k = solve(c, x["power_reg"] * ratio) if abs(math.log(ratio)) > 0.005 else (c, 1.0)
-        v = rounded(v, c) if k != 1.0 else c
+        # the base's own factor, not a second solve: a regiment of renown then gains the same share of health and
+        # damage as its base, and never ends with less of either than the unit it is a better version of
+        k = (b.get("k") or 1.0) if abs(math.log(ratio)) > 0.005 else 1.0
+        v = rounded(scaled(c, k), c) if k != 1.0 else c
         new_cost = price_round(x["cost"] * price_ratio) if x["cost"] else x["cost"]
         o.update(action="lore" if b["action"] == "lore" else ("stats" if k != 1.0 else "price"), after=snapshot(v), k=k,
                  drift=UM.identity_drift(c, v) if k != 1.0 else 0.0, new_cost=new_cost,
                  new_campaign_cost=(price_round(x["campaign_cost"] * new_cost / x["cost"]) if x["campaign_cost"] and x["cost"] else x["campaign_cost"]),
                  new_upkeep=int(round(x["upkeep"] * new_cost / x["cost"])) if x["cost"] else x["upkeep"],
-                 note="regiment of renown: follows %s (power x%.2f, price x%.2f)" % (b["name"], ratio, price_ratio))
+                 note="regiment of renown: follows %s" % b["name"])
         o["after"]["power_reg"] = UM.regiment_power(v) if k != 1.0 else x["power_reg"]
         o.pop("held", None)
         if o["drift"] > 0.03:                           # the same factor would change how this regiment fights
@@ -500,8 +520,9 @@ def guard(props):
 
 
 def apply_gunpowder(props):
-    """the gunpowder rule (gunpowder.py) on top of whatever else the unit got: a heavier volley, a slower reload. It is a
-    design rule, not a balance correction, so the price stays where the rest of the solver put it."""
+    """the gunpowder rule (gunpowder.py) on top of whatever else the unit got: a heavier volley, a slower reload and
+    less ammunition, so the damage over a battle is vanilla's. It is a design rule, not a balance correction: the unit's
+    worth barely moves (about +7% while it fires), so the price stays where the rest of the solver put it."""
     n = 0
     for o in props:
         if o["key"] in UNREVIEWED or o["action"] == "decided":
@@ -510,32 +531,132 @@ def apply_gunpowder(props):
         if not GP.applies(c, o["caste"]):
             continue
         a = o["after"]
-        v = dict(c, men=a["men"], ma=a["ma"], md=a["md"], hp=a["hp"], base=a["base"], ap=a["ap"], bvl=a["bvl"], bvi=a["bvi"])
+        v = dict(c, men=a["men"], ma=a["ma"], md=a["md"], cb=a["cb"], hp=a["hp"], base=a["base"], ap=a["ap"], bvl=a["bvl"], bvi=a["bvi"])
         if a.get("missile"):
             v["missile"] = dict(c["missile"], **{d: a["missile"][d] for d in ("base", "ap", "bvl", "bvi")})
         v = GP.apply(v)
         o["gun"] = [GP.DAMAGE, GP.RELOAD]
-        o["after"]["missile"] = dict(a["missile"], **{d: v["missile"][d] for d in ("base", "ap", "bvl", "bvi")}, reload=v["missile"]["reload"])
-        before_gun = o["after"]["power_reg"]
+        o["after"]["missile"] = dict(a["missile"], **{d: v["missile"][d] for d in ("base", "ap", "bvl", "bvi")},
+                                     reload=v["missile"]["reload"], ammo=v["missile"]["ammo"])
         o["after"]["power_reg"] = UM.regiment_power(v)
-        # the price follows what the rule adds (never below vanilla: a stronger unit does not get cheaper)
-        x = ROWS[o["key"]]
-        if x["cost"]:
-            # the whole change against vanilla decides the price, in the same direction and within the limit
-            total = o["after"]["power_reg"] / o["power_reg"]
-            want = price_round(o["new_cost"] * o["after"]["power_reg"] / before_gun)
-            lo, hi = (x["cost"], x["cost"] * math.exp(PRICE_LIMIT)) if total >= 1 else (x["cost"] * math.exp(-PRICE_LIMIT), x["cost"])
-            o["new_cost"] = int(min(hi, max(lo, want)))
-            o["new_cost"] = price_round(o["new_cost"]) if lo <= price_round(o["new_cost"]) <= hi else o["new_cost"]
-            o["new_campaign_cost"] = price_round(x["campaign_cost"] * o["new_cost"] / x["cost"]) if x["campaign_cost"] else x["campaign_cost"]
-            o["new_upkeep"] = int(round(x["upkeep"] * o["new_cost"] / x["cost"]))
         if o["action"] == "none":
             o["action"] = "gunpowder"
-            o["note"] = "gunpowder: volley x%.2f, reload x%.2f. %s" % (GP.DAMAGE, GP.RELOAD, o["note"])
+            o["note"] = "gunpowder: volley x%.2f, reload x%.2f, ammunition x%.2f. %s" % (GP.DAMAGE, GP.RELOAD, GP.AMMO, o["note"])
         else:
-            o["note"] += "; gunpowder: volley x%.2f, reload x%.2f" % (GP.DAMAGE, GP.RELOAD)
+            o["note"] += "; gunpowder: volley x%.2f, reload x%.2f, ammunition x%.2f" % (GP.DAMAGE, GP.RELOAD, GP.AMMO)
         n += 1
     return n
+
+
+def elite_family_prices(props):
+    """variants of one lore elite (Blood Knights with lances, with sword and shield) move by one price ratio, the lowest
+    any of them earns, so no variant is charged more than it is worth and CA's price order between them stays"""
+    for name, rx in ELITE_FAMILIES.items():
+        fam = [o for o in props if o.get("elite") and re.search(rx, o["key"]) and o["cost"]]
+        if len(fam) < 2:
+            continue
+        ratio = min(o["new_cost"] / o["cost"] for o in fam)
+        for o in fam:
+            x = ROWS[o["key"]]
+            o["new_cost"] = price_round(o["cost"] * ratio)
+            o["new_campaign_cost"] = price_round(x["campaign_cost"] * o["new_cost"] / x["cost"]) if x["campaign_cost"] else x["campaign_cost"]
+            o["new_upkeep"] = int(round(x["upkeep"] * o["new_cost"] / x["cost"]))
+
+
+def reprice(o, new_cost):
+    x = ROWS[o["key"]]
+    o["new_cost"] = new_cost
+    o["new_campaign_cost"] = price_round(x["campaign_cost"] * new_cost / x["cost"]) if x["campaign_cost"] and x["cost"] else x["campaign_cost"]
+    o["new_upkeep"] = int(round(x["upkeep"] * new_cost / x["cost"])) if x["cost"] else x["upkeep"]
+
+
+def make_beta(props):
+    """What the beta ships. Every proposal is published (reports/proposals.md); the pack takes the themes only:
+
+      lore elites      the ELITE units, in full
+      elite infantry   melee infantry the ladder rates elite or champion (and THEME_ALSO): stronger at the vanilla price.
+                       The theme is "worth its price", so it moves one lever, the strength; the draft's price for the
+                       unit stays a proposal. A regiment of renown is in the theme only with its base unit, and a unit
+                       whose regiment of renown the community list remodels waits (the list has spoken for that family).
+      community list   a unit the list names, or a regiment of renown or campaign twin of one (community.resolve), takes
+                       the list's numbers (applied by the builder) and nothing from the model; the lore elites excepted
+      gunpowder        the rule, on top of any of the above
+    Everything else is vanilla in the pack."""
+    import copy
+    import community
+    beta = copy.deepcopy(props)
+    by_name = {}
+    for o in beta:
+        by_name.setdefault(o["name"], []).append(o)
+    full = {o["key"]: o for o in props}
+    resolved = community.resolve([o["key"] for o in beta], UM.name, UM.faction)
+    named = {k for _, _, _, keys in resolved for k in keys}
+    # a base whose regiment of renown the list itself names (Swordmasters of Hoeth: the Blades of Hoeth are remodelled
+    # against the vanilla Swordmasters) stays out of the theme, so the list's remodel keeps the relation it was written for
+    spoken_for = set()
+    for _, _, ch, keys in resolved:
+        if ch.get("_follows"):
+            continue
+        for k in keys:
+            b = base_of(full[k], by_name)
+            if b is not None and b is not full[k]:
+                spoken_for.add(b["key"])
+
+    def rated_elite(o):                        # judged on the draft, before anything here changes a note
+        d = full[o["key"]]
+        return (d["action"] == "lore" and d["caste"] == "melee_infantry" and not d.get("elite")
+                and (d["note"].startswith(("elite:", "champion:")) or bool(THEME_ALSO.search(d["key"]))))
+
+    def moved(o):
+        return abs((full[o["key"]].get("k") or 1.0) - 1.0) > 1e-9
+
+    def themed(o):
+        if o["key"] in named or o["key"] in spoken_for or o.get("elite") or not moved(o):
+            return False
+        b = base_of(o, by_name)
+        if UM.card(o["key"])["renown"] or (b is not None and b is not o):
+            # a regiment of renown: only with its base, and only if its base is in the theme
+            return (b is not None and b is not o and b["key"] not in named and b["key"] not in spoken_for
+                    and rated_elite(b) and moved(b))
+        return rated_elite(o)
+    in_theme = {o["key"] for o in beta if themed(o)}
+    for o in beta:
+        o.pop("gun", None)
+        if o["key"] in named and not o.get("elite"):
+            vanilla_prop(o, "community list (community.py): " + o["note"] if o["action"] != "none" else o["note"])
+            o["community"] = True
+        elif o["key"] in in_theme:
+            o["theme"] = "elite infantry"
+            if o["new_cost"] != o["cost"]:
+                reprice(o, o["cost"])
+                o["note"] += "; the theme moves strength only, the price stays"
+        elif not o.get("elite"):
+            vanilla_prop(o, "proposal only (not in the beta): " + o["note"] if o["action"] != "none" else o["note"])
+    # a themed change can make an untouched roster mate the dearer-but-weaker one; take that mate's draft change too
+    # (the full draft is consistent), and only if the draft has none, let the guard revert the themed change
+    by_key = {o["key"]: o for o in beta}
+    before = inversions(beta, False)
+    while True:
+        adopt = {k for pair in inversions(beta, True) if pair not in before for k in pair
+                 if by_key[k]["action"] == "none" and full[k]["action"] == "lore" and not by_key[k].get("community")
+                 and k not in spoken_for}
+        if not adopt:
+            break
+        for k in adopt:
+            by_key[k].update(copy.deepcopy(full[k]), theme="elite infantry (roster fit)")
+    print("beta: roster mates taken from the draft:", sorted(o["name"] for o in beta if o.get("theme") == "elite infantry (roster fit)"))
+    print("beta: gunpowder rule applied:", apply_gunpowder(beta), "| elites:", sum(1 for o in beta if o.get("elite")))
+    print("beta: reverted by the guard:", guard(beta))
+    # a regiment of renown whose base the guard sent back to vanilla goes back with it
+    for o in beta:
+        b = base_of(o, by_name)
+        if o.get("theme") and b and b is not o and b["action"] == "none" and o["action"] != "none":
+            vanilla_prop(o, "regiment of renown: follows %s, which is unchanged in the beta" % b["name"])
+    for o in beta:
+        if o["action"] == "none" or (o["action"] == "gunpowder" and o.get("theme")):
+            o.pop("theme", None)
+    print("beta: elite infantry:", sum(1 for o in beta if o.get("theme")), "| community list:", sum(1 for o in beta if o.get("community")))
+    return beta
 
 
 def main():
@@ -545,6 +666,7 @@ def main():
     for o in props:
         by_name.setdefault(o["name"], []).append(o)
     base_of_cache.update({o["key"]: base_of(o, by_name) for o in props})
+    elite_family_prices(props)
     print("regiments of renown following their base:", follow_bases(props))
     reverted = guard(props)
     print("reverted by the pay-more-get-less guard: %d %s" % (len(reverted), reverted[:12]))
@@ -595,47 +717,7 @@ def main():
             for o in sorted(ps, key=lambda o: (o["action"] == "none", o["caste"], -o["power_reg"])):
                 w(row(o))
     json.dump(dict(weights=S["weights"], tolerance=TOLERANCE, cap=CAP, units=props), open(OUT_JSON, "w"), indent=1)
-    # the beta: every proposal is published, but only the design rules go into the pack; the rest waits for players
-    import copy
-    beta = copy.deepcopy(props)
-    by_name = {}
-    for o in beta:
-        by_name.setdefault(o["name"], []).append(o)
-    def elite_infantry(o):
-        """beta theme 2: elite infantry worth its price (the complaint the community and CA agree on)"""
-        if o["action"] != "lore" or o["caste"] != "melee_infantry":
-            return False
-        if o["note"].startswith(("elite:", "champion:")):
-            return True
-        b = base_of(o, by_name)
-        return bool(b) and b is not o and b["note"].startswith(("elite:", "champion:"))
-    import community                           # a unit on the community's list takes their numbers, not the model's
-    named = {k for _, _, _, keys in community.resolve([o["key"] for o in beta], UM.name, UM.faction) for k in keys}
-    for o in beta:
-        o.pop("gun", None)
-        if o["key"] in named and not o.get("elite"):
-            vanilla_prop(o, "community list (community.py): " + o["note"] if o["action"] != "none" else o["note"])
-            o["community"] = True
-        elif elite_infantry(o):
-            o["theme"] = "elite infantry"
-        elif not o.get("elite"):
-            vanilla_prop(o, "proposal only (not in the beta): " + o["note"] if o["action"] != "none" else o["note"])
-    # a themed change can make an untouched roster mate the dearer-but-weaker one; take that mate's draft change too
-    # (the full draft is consistent), and only if the draft has none, let the guard revert the themed change
-    full = {o["key"]: o for o in props}
-    by_key = {o["key"]: o for o in beta}
-    before = inversions(beta, False)
-    while True:
-        adopt = {k for pair in inversions(beta, True) if pair not in before for k in pair
-                 if by_key[k]["action"] == "none" and full[k]["action"] == "lore" and not by_key[k].get("community")}
-        if not adopt:
-            break
-        for k in adopt:
-            by_key[k].update(copy.deepcopy(full[k]), theme="elite infantry (roster fit)")
-    print("beta: roster mates taken from the draft:", sorted(o["name"] for o in beta if o.get("theme") == "elite infantry (roster fit)"))
-    print("beta: gunpowder rule applied:", apply_gunpowder(beta), "| elites:", sum(1 for o in beta if o.get("elite")),
-          "| elite infantry:", sum(1 for o in beta if o.get("theme") == "elite infantry"))
-    print("beta: reverted by the guard:", guard(beta))
+    beta = make_beta(props)
     json.dump(dict(weights=S["weights"], tolerance=TOLERANCE, cap=CAP, units=beta), open(BETA_JSON, "w"), indent=1)
     print("proposals:", {k: len(v) for k, v in by_action.items()})
     print("wrote", OUT_MD, "and", OUT_JSON)

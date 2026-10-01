@@ -28,6 +28,7 @@ Change keys (all deltas unless marked "set"):
   missile_res          missile resistance in percent points
   spacing rank_depth men ammo_set   set values
 """
+import os
 import re
 
 # --- crewed artillery: engine entities, set values, changed in place (every piece using that engine) ---------------
@@ -224,8 +225,37 @@ HELD = {
 }
 
 
+# What a regiment of renown takes when the list changes its base unit: the changes to how the unit fights. Not the
+# price (a regiment of renown has its own), and not a remodel written for one unit (size, set values).
+FOLLOW = ("ma", "md", "cb", "ld", "hp", "ws_base", "ws_ap", "ws_swap", "bvi", "bvl", "armour", "mass", "speed", "accel", "decel",
+          "turn", "accuracy", "ammo", "missile_base", "missile_ap", "range", "reload", "missile_res", "calibration_set",
+          "shockwave", "spacing", "rank_depth")
+TWIN = re.compile(r"^(.*?) \((?:(.+?) [-–] )?Grudge Settlers\)$")      # a campaign reward copy of a normal unit
+
+
+def bases(name):
+    """the unit names a regiment of renown or campaign twin follows, most specific first, as (name, is a twin):
+    'Peak Gate Guard (Hammerers)' -> Hammerers; 'X (Longbeards – Great Weapons)' -> Longbeards (Great Weapons), then
+    Longbeards; 'Hammerers (Grudge Settlers)' -> Hammerers, a twin (the same unit under another key)"""
+    m = TWIN.match(name)
+    if m:
+        return [(m.group(1) + (" (%s)" % m.group(2) if m.group(2) else ""), True)]
+    m = re.match(r"^(.*) \((.+)\)$", name)
+    if not m:
+        return []
+    inner = m.group(2)
+    out = [inner, re.sub(r" [-–] (.+)$", r" (\1)", inner), re.sub(r" [-–] .+$", "", inner)]
+    return [(n, False) for i, n in enumerate(out) if n not in out[:i]]
+
+
 def resolve(units, name_of, faction_of):
-    """entry -> the unit keys it names (full-name match, faction filter where the name is shared); held entries skipped"""
+    """entry -> the unit keys it names (full-name match, faction filter where the name is shared); held entries skipped.
+
+    Then the followers. A regiment of renown moves with its base unit (the patch's rule everywhere else): where the list
+    changes a base unit and does not name its regiment of renown, the regiment takes the same changes to how it fights
+    (FOLLOW), so it is never left behind the unit it is a better version of. A campaign twin (Grudge Settlers) is the
+    same unit under another key and takes everything, the price included. A follower entry has the same line number,
+    '_follows' set to the base unit's name, and only the followed changes."""
     out = []
     for line, pat, ch in UNITS:
         if line in HELD:
@@ -233,17 +263,105 @@ def resolve(units, name_of, faction_of):
         rx = re.compile(r"^(%s)$" % pat)
         keys = [k for k in units if rx.match(name_of(k)) and (not ch.get("_faction") or faction_of(k) == ch["_faction"])]
         out.append((line, pat, ch, keys))
+    named = {k for _, _, _, keys in out for k in keys}
+    by_name = {}
+    for k in units:
+        by_name.setdefault((name_of(k), faction_of(k)), []).append(k)
+    renown = _renown(units)
+    follow = {}
+    for k in units:
+        if k in named:
+            continue
+        for base, twin in bases(name_of(k)):
+            if not twin and k not in renown:
+                break                                      # 'Chaos Warriors (Halberds)' is a variant, not a regiment of renown
+            base_keys = [b for b in by_name.get((base, faction_of(k)), []) if b in named]
+            if base_keys:
+                follow[k] = (base, twin, set(base_keys))
+                break
+    for line, pat, ch, keys in list(out):
+        by_base = {}
+        for k, (base, twin, base_keys) in follow.items():
+            if base_keys & set(keys):
+                by_base.setdefault((base, twin), []).append(k)
+        for (base, twin), fkeys in sorted(by_base.items()):
+            fch = {c: v for c, v in ch.items() if c in FOLLOW or (twin and not c.startswith("_"))}
+            if fch:
+                out.append((line, "follows " + base, dict(fch, _follows=base), sorted(fkeys)))
     return out
 
 
+def _renown(units):
+    """the regiments of renown among the units (the game's own flag, or the key)"""
+    import vanilla as V
+    MU = V.index("main_units", "unit")
+    return {k for k in units if MU.get(k, {}).get("is_renown") == "true" or "_ror" in k}
+
+
+import json
+
+RESOLVED = os.path.join(os.path.dirname(os.path.abspath(__file__)), "community_resolved.json")
+
+
+def check_resolution(units, name_of, faction_of):
+    """the units each entry names, against the record in community_resolved.json. An entry is matched by the unit's
+    English name, so a rename by CA (or a new unit with a matching name) silently changes what the pack does: any
+    difference from the record is a failure until someone has looked and run `python3 community.py --write`."""
+    if not os.path.exists(RESOLVED):
+        return ["community_resolved.json is missing: run python3 community.py --write and commit it"]
+    want = json.load(open(RESOLVED))
+    now = record(units, name_of, faction_of)
+    out = []
+    for key in sorted(set(want) | set(now)):
+        was, cur = want.get(key), now.get(key)
+        if was is None:
+            out.append("%s is not in community_resolved.json (new? look, then run community.py --write)" % key)
+        elif cur is None:
+            out.append("%s is in community_resolved.json but no longer in the list" % key)
+        elif sorted(was["keys"]) != sorted(cur["keys"]):
+            gone, new = sorted(set(was["keys"]) - set(cur["keys"])), sorted(set(cur["keys"]) - set(was["keys"]))
+            out.append("%s names different units than recorded: no longer %s, now also %s" % (key, gone, new))
+        elif was["changes"] != cur["changes"]:
+            out.append("%s: the numbers differ from the record: %s, recorded %s" % (key, cur["changes"], was["changes"]))
+    return out
+
+
+def record(units, name_of, faction_of):
+    """what the list does today, in a form that can be compared: for every entry the units (or shared entities) it
+    reaches and the numbers it applies. A typo in a number is then a difference somebody has to look at, as a renamed
+    unit is."""
+    import vanilla as V
+    out = {}
+    for line, pat, ch, keys in resolve(units, name_of, faction_of):
+        tag = "%d %s" % (line, "followers of " + ch["_follows"] if ch.get("_follows") else "units")
+        out[tag] = dict(keys=sorted(keys), changes={k: v for k, v in sorted(ch.items()) if k != "_follows"})
+    for line, what, ents, sets in ARTILLERY + ENTITIES:
+        out["%d entities" % line] = dict(keys=sorted(ents), changes=dict(sorted(sets.items())))
+    line, what, rx, accel = MOUNT_ACCEL
+    MO, BE = V.index("mounts"), V.index("battle_entities")
+    out["%d mounts" % line] = dict(keys=sorted({MO[m]["entity"] for m in MO if rx.search(m) and MO[m]["entity"] in BE}),
+                                   changes=dict(acceleration=accel))
+    return json.loads(json.dumps(out))                    # as it reads back from the file
+
+
 if __name__ == "__main__":
+    import sys
     import unit_model as UM
     rec = UM.recruitable()
     miss = 0
-    for line, pat, ch, keys in resolve(rec, UM.name, UM.faction):
+    res = resolve(rec, UM.name, UM.faction)
+    for line, pat, ch, keys in res:
         print("%4d %-50s %2d  %s" % (line, pat[:50], len(keys), ", ".join(sorted({UM.name(k) for k in keys}))[:150]))
         miss += not keys
     print("entries with no unit:", miss)
+    if "--write" in sys.argv:
+        json.dump(record(rec, UM.name, UM.faction), open(RESOLVED, "w"), indent=0, sort_keys=True)
+        print("wrote", RESOLVED)
+    else:
+        problems = check_resolution(rec, UM.name, UM.faction)
+        for p in problems:
+            print("FAIL", p)
+        sys.exit(1 if problems or miss else 0)
 
 
 # ------------------------------------------------------------------------------------------------- applying it
@@ -254,9 +372,16 @@ def _price(x):
     return int(round(x / 5.0)) * 5
 
 
-def apply(out, V, coerce, name_of, faction_of, units, skip=()):
+def apply(out, V, coerce, name_of, faction_of, units, skip=(), guns=None):
     """out: {table: {key: coerced row}} as the builder has them; rows not in it are copied from vanilla on first touch.
-    Returns a log of (line, unit or entity, what changed)."""
+    Returns a log of (line, unit or entity, what changed).
+
+    guns: {land unit: (damage factor, reload factor)} for units under the gunpowder rule. The list's numbers are written
+    for the vanilla weapon, so on a gun they go through the same rule: a missile damage change is multiplied by the
+    damage factor, a reload change by the reload factor, and an ammunition change is made to the vanilla count before
+    the rule cuts it. "-1 second reload" on Deck Gunners then still means a faster reload than their neighbours."""
+    import gunpowder as GP
+    guns = guns or {}
     LU, MU, MW, MIS, PJ, BE = (V.index("land_units"), V.index("main_units", "unit"), V.index("melee_weapons"),
                                V.index("missile_weapons"), V.index("projectiles"), V.index("battle_entities"))
     MO = V.index("mounts")
@@ -266,6 +391,9 @@ def apply(out, V, coerce, name_of, faction_of, units, skip=()):
         armours.setdefault((m.group(1) if m else "", int(float(r["armour_value"]))), r["key"])
     armour_value = {r["key"]: int(float(r["armour_value"])) for r in V.table("unit_armour_types")}
     vanilla = dict(land_units=LU, main_units=MU, melee_weapons=MW, missile_weapons=MIS, projectiles=PJ, battle_entities=BE)
+    ALT = {}                                   # a unit's alternate ammunition (anti-large arrows, an upgraded gun)
+    for r in V.table("unit_missile_weapon_junctions"):
+        ALT.setdefault(r["unit"], []).append(r)
     log = []
 
     def row(table, key):
@@ -317,7 +445,39 @@ def apply(out, V, coerce, name_of, faction_of, units, skip=()):
                 if lu["num_mounts"] == men:
                     lu["num_mounts"] = ch["men"]
                 mu["num_men"] = men = ch["men"]
-            log.append((line, key, {k: v for k, v in ch.items() if not k.startswith("_")}))
+            log.append((line, key, dict({k: v for k, v in ch.items() if not k.startswith("_")},
+                                        **({"follows": ch["_follows"]} if ch.get("_follows") else {}))))
+            gun_d, gun_r = guns.get(lukey, (1.0, 1.0))
+            pkeys = [k for k in ("missile_base", "missile_ap", "range", "reload", "calibration_set", "shockwave") if k in ch]
+
+            def shoot(p):                      # the entry's missile changes on one projectile
+                p["damage"] += int(round(ch.get("missile_base", 0) * gun_d))
+                p["ap_damage"] += int(round(ch.get("missile_ap", 0) * gun_d))
+                p["effective_range"] += ch.get("range", 0)
+                p["base_reload_time"] = round(p["base_reload_time"] + ch.get("reload", 0) * gun_r, 2)
+                if "calibration_set" in ch:
+                    p["calibration_area"] = ch["calibration_set"]
+                if "shockwave" in ch:
+                    p["shockwave_radius"] = ch["shockwave"]
+            if pkeys:
+                # the unit's alternate ammunition takes the same change, or switching ammunition would lose it: the
+                # builder's own scaled copy where there is one (a gun), else a copy made here, with the junction
+                # row overridden by its id
+                jt = out.setdefault("unit_missile_weapon_junctions", {})
+                for i, j in enumerate(ALT.get(key, [])):
+                    if j["missile_weapon"] not in MIS:
+                        continue
+                    jj = jt.get(str(j["id"]))
+                    if jj is None:
+                        amw = copy("missile_weapons", j["missile_weapon"], "cbp_%s_alt%d" % (key, i))
+                        ap_ = copy("projectiles", amw["default_projectile"], "cbp_%s_alt%d" % (key, i))
+                        amw["default_projectile"] = ap_["key"]
+                        jj = coerce("unit_missile_weapon_junctions", j)
+                        jj["missile_weapon"] = amw["key"]
+                        jt[str(j["id"])] = jj
+                    else:
+                        ap_ = out["projectiles"][out["missile_weapons"][jj["missile_weapon"]]["default_projectile"]]
+                    shoot(ap_)
             if not first:
                 continue
             for k, col in (("ma", "melee_attack"), ("md", "melee_defence"), ("cb", "charge_bonus"), ("ld", "morale"),
@@ -327,6 +487,8 @@ def apply(out, V, coerce, name_of, faction_of, units, skip=()):
             for k, col in (("spacing", "spacing"), ("rank_depth", "rank_depth"), ("ammo_set", "primary_ammo")):
                 if k in ch:
                     lu[col] = ch[k]
+            if lukey in guns and ("ammo" in ch or "ammo_set" in ch):
+                lu["primary_ammo"] = GP.ammo(ch["ammo_set"] if "ammo_set" in ch else int(float(LU[lukey]["primary_ammo"])) + ch["ammo"])
             man = BE[lu["man_entity"]]
             if "hp" in ch or "hp_total" in ch:
                 lu["bonus_hit_points"] = max(0, lu["bonus_hit_points"] + ch.get("hp", 0) + int(round(ch.get("hp_total", 0) / max(1, men))))
@@ -348,7 +510,6 @@ def apply(out, V, coerce, name_of, faction_of, units, skip=()):
                 w["bonus_v_large"] += ch.get("bvl", 0)
                 if "ws_base_set" in ch:
                     w["damage"], w["ap_damage"] = ch["ws_base_set"], ch["ws_ap_set"]
-            pkeys = [k for k in ("missile_base", "missile_ap", "range", "reload", "calibration_set", "shockwave") if k in ch]
             if pkeys:
                 mk = lu["primary_missile_weapon"]
                 if mk.startswith(("gr_", "cbp_")):
@@ -359,14 +520,7 @@ def apply(out, V, coerce, name_of, faction_of, units, skip=()):
                 p = row("projectiles", pk) if pk.startswith(("gr_", "cbp_")) else copy("projectiles", pk, "cbp_" + lukey)
                 mw["default_projectile"] = p["key"]
                 lu["primary_missile_weapon"] = mw["key"]
-                p["damage"] += ch.get("missile_base", 0)
-                p["ap_damage"] += ch.get("missile_ap", 0)
-                p["effective_range"] += ch.get("range", 0)
-                p["base_reload_time"] = round(p["base_reload_time"] + ch.get("reload", 0), 2)
-                if "calibration_set" in ch:
-                    p["calibration_area"] = ch["calibration_set"]
-                if "shockwave" in ch:
-                    p["shockwave_radius"] = ch["shockwave"]
+                shoot(p)
             ekeys = [k for k in ("mass", "speed", "accel", "decel", "turn") if k in ch]
             if ekeys:
                 ek = lu["man_entity"]

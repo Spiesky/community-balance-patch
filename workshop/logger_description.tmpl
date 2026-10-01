@@ -1,0 +1,43 @@
+[b]Battle Logger 2[/b]. An optional add-on for the [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3810476227]Community Balance Patch[/url]. It works without the patch too: vanilla battles are the baseline everything is compared against, so run it even if you do not use the patch.
+
+Balance arguments are easy to win with opinions and hard to win with data. This little mod collects the data. If you run it and share the log, thank you. It helps more than you would think.
+
+[h2]What it does[/h2]
+
+After every battle it writes a few lines to a text file on your PC, [b]cbp_battle_log.txt[/b] in your game folder. Nothing else. After a handful of battles I can see how units actually perform, not just how they look on paper.
+
+[h2]What it records, exactly[/h2]
+
+For a battle you fight (campaign or custom):
+[list]
+[*]The battle: the date and time, its type, whether it came from a campaign, which side you were on, who won, how long it lasted.
+[*]Each unit: models at the start and the end, kills, the share of its hit points left, ammunition left, whether it is the general, whether it routed and when.
+[/list]
+
+For every campaign battle you take part in, fought or auto-resolved (single player only):
+[list]
+[*]The battle: fought or auto-resolved, who won, the turn, the campaign difficulty, the battle type, the campaign.
+[*]Each unit on both sides: strength before and after, experience level, faction.
+[/list]
+
+And for both: which version of the Community Balance Patch was loaded, and the names of the mod packs you had enabled, so I can tell when another mod changed the result. Pack names only, never folder paths.
+
+No Steam name, no character names, nothing personal. The file is plain text, so you can open it and check, and [url=https://github.com/Spiesky/community-balance-patch/blob/main/docs/LOG_FORMAT.md]every field is written down[/url]. The two scripts are [url=https://github.com/Spiesky/community-balance-patch/tree/main/logger]public[/url].
+
+[h2]Nothing leaves your PC[/h2]
+
+The game's scripts cannot go online, so the log just sits in your game folder (in Steam: right-click the game, Manage, Browse local files). You decide if and when to share it.
+
+[h2]How to share it[/h2]
+
+Go to [url=https://spiesky.github.io/community-balance-patch/]the upload page[/url] and drop the file on it. It shows you what is in your log. Then either:
+[list]
+[*][b]Copy summary[/b] and paste it into a comment or a discussion on the patch's Workshop page. No account needed beyond Steam.
+[*][b]Send my log[/b], which opens a GitHub report with the log already filled in (you need a free GitHub account). The list of your mod pack names is part of that public report, so look at it before you press Submit.
+[/list]
+
+Every log helps, even one or two battles.
+
+[h2]Compatibility[/h2]
+
+It reads the game and writes one text file after each battle. To tell a campaign what a battle's units had before it started, it also keeps two small notes in the game's script memory; they are gone when the game closes and are never saved. Every step is wrapped so that a failure can never affect your battle or campaign: if something goes wrong, the log gets a line saying so and the game carries on. It should work alongside anything. The campaign part does nothing in multiplayer campaigns; battles fought in multiplayer are still logged, with both players' units.

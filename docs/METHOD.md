@@ -14,7 +14,7 @@ lore layer.
 - **`tools/lore_ladder.py`:** the lore ladder for infantry, monsters, beasts and machines: the judgments, one line each.
 - **`reports/changelog.md`:** what changed, one line per unit, in plain words.
 - **`reports/ladder.md`:** every faction's roster in ladder order, the page to review the judgments on.
-- **`build/community_balance_patch.pack`:** the build (`tools/build_rebalance.py`). **Not yet tested in a campaign.**
+- **`build/beta/community_balance_patch.pack`:** the Workshop pack (`tools/patch_day.sh`); `build/draft/` holds the whole draft. **Not yet tested in a campaign.**
 
 ---
 
@@ -146,6 +146,14 @@ model's absolute figures (the model folds permanent passives into its card: Swor
 the database says 34), once per land unit (several main units can share one), with a copy of the weapon carrying
 the vanilla damage times k (weapons are shared between units; a shared row is never edited), the same for the
 projectile and for every alternate ammunition the unit carries.
+
+**The lore elites and overkill** (added with beta 0.2). For the few units whose size and damage change by a large
+factor (Blood Knights at 24 instead of 60, each 2.5 times the rider), two things are different. The charge bonus
+scales by k with the damage, so the charge stays what it was next to the unit's own blows. And the unit is priced on
+its **usable** power: the model above lets a 188-damage blow into a 50-HP Skavenslave count as 3.8 kills, which it
+is not, so for these units a blow is capped at the hit points of what it can reach (one model, or a splash attack's
+few) before the regiment is measured (`cavalry_model.blow(usable=True)`, `unit_model.usable_power`). The survey's
+scale is still fitted without the cap; see the open items in [TOOLS.md](TOOLS.md).
 
 **Pricing a lore change.** Where the caste's line is trusted (infantry, cavalry) the price becomes what the
 valuation says the new unit is worth, within ×1.6 of vanilla: a unit that was a bargain and is now stronger pays
@@ -291,7 +299,9 @@ measured since 2026-09-16); poison and other contact effects;
 the Luminark's beam and the Solar Engine's hits are modelled as artillery and probably over-counted; accuracy
 against moving targets; a chariot's real collision behaviour and cycle charging; a cannon's value on a siege map;
 terror routing a block before the fight; formations; who a sniper aims at; animations, which no database model
-sees. Every one of these shows up as a residual. The ladder's **keep** entries are where they pile up on purpose:
+sees; overkill, outside the lore elites (a blow that does more damage than its target has hit points is counted in
+full); bonuses a campaign gives per model, which are worth less on a unit of fewer, stronger models (healing restores
+the same hit points but brings back fewer models). Every one of these shows up as a residual. The ladder's **keep** entries are where they pile up on purpose:
 chaff, snipers, explosion and poison weapons, weapon teams. The two units the price layer once held (the Bull
 Centaur Renders of renown, the Amethyst Outriders, both shooting cavalry the model rates far above their price) are
 kept as vanilla by the ladder now.
