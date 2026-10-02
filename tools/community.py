@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The community's own balance list, as the community wrote it.
 
-Source: "Community sourced, peer-reviewed balance recommendations list (patch 7.1+)", Total Tavern and Vermin League
+Inspired by: "Community sourced, peer-reviewed balance recommendations list (patch 7.1+)", Total Tavern and Vermin League
 discords, posted 2 March 2026 on the CA forums:
 https://community.creative-assembly.com/total-war/total-war-warhammer/forums/15-total-war-warhammer/threads/13577
 CA's 7.2, 8.0 and 9.0 made no numbered balance changes; 8.1 (9 July 2026) adopted about 60 of these recommendations

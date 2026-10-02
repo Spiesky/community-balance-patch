@@ -36,6 +36,14 @@ STATS = {
 }
 
 
+# Lore elites' bodies. A few heavy models keep a light infantryman's mass in vanilla, so with the extra health each one
+# survives more hits and gets knocked about all battle. Set by hand, written only while the unit is a lore elite.
+ELITE_BODIES = {
+    "wh2_dlc11_cst_infantry_depth_guard_blood_dismembers": dict(mass=250, knock_interrupts_ignore_chance=60),     # Depth Guard, both
+    "wh2_dlc11_cst_infantry_depth_guard_ror_blood_dismembers": dict(mass=250, knock_interrupts_ignore_chance=60), # Bloody Reaver Deck Guard
+}
+
+
 def coerce(table, row):
     """Dump values are strings; cast them to what the schema wants."""
     out = {}

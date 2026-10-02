@@ -62,6 +62,7 @@ ELITE_FAMILIES = {            # units CA prices together: they move by one price
     "Blood Knights": r"vmp_blood_knights|vmp_cav_blood_knights",
     "Grail Knights and Guardians": r"brt_cav_grail_knights|brt_cav_grail_guardians",   # both 1850 in vanilla
     "Swords of Chaos": r"chs_cav_chaos_knights_ror_0",
+    "Depth Guard": r"cst_inf_depth_guard",                                              # the Lahmian Handmaidens' shape
 }
 ELITE = re.compile("|".join(ELITE_FAMILIES.values()))
 ELITE_PRICE_CAP = math.log(1.6)

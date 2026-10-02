@@ -3,6 +3,20 @@
 One entry per Workshop upload of the patch. What each release changes unit by unit is in `reports/beta_changelog.md`
 at that release's tag (tags start with 0.2.0). The Battle Logger has its own notes at the end.
 
+## 0.2.1 (2 October 2026)
+
+Built for game version 9.0. Now called an alpha: it's a work in progress.
+
+- **Depth Guard are a lore elite**, like the Lahmian Handmaidens: 32 drowned bodyguards instead of 60, each with
+  nearly twice the health and damage, +6 attack and defence. They're heavier (mass 160 to 250) and shrug off
+  knockback more often, so they don't get thrown around. Depth Guard 1100 to 1500 gold, Polearms 1200 to 1650,
+  Bloody Reaver Deck Guard 1500 to 2050.
+- **The patch only changes regular units.** Lords, heroes, spells and auto-resolve are for a separate mod later.
+- The community changes are now credited as inspired by the Total Tavern and Vermin League list and general player
+  sentiment.
+
+Proposed by Spiesky. Tested in game by: Spiesky (Depth Guard against Lahmian Handmaidens, before the weight change).
+
 ## 0.2.0 (1 October 2026)
 
 Built for game version 9.0.
@@ -12,7 +26,7 @@ New in the pack:
 - **Elite infantry is worth its price.** Infantry the lore rates elite (Greatswords, Bestigors, Slayers, Ironbreakers,
   Infernal Ironsworn, Exalted Bloodletters, Exalted Plaguebearers, Exalted Daemonettes, Wildwood Rangers and others)
   gets more health and damage, up to about 17%, and a point or two of attack and defence, at the vanilla price.
-- **The multiplayer community's balance list** (Total Tavern and Vermin League, patch 7.1+), as written, minus what CA
+- **Community balance opinions**, inspired by the Total Tavern and Vermin League list (patch 7.1+) and general player sentiment, minus what CA
   did in 8.1 and minus five entries held for campaign. Where the list changes a unit and does not mention its regiment
   of renown, the regiment takes the same changes. It includes more responsive artillery, and a few nerfs written for
   multiplayer: Zombies +25 gold, Skeleton Horse Archers +25, Ruglud's Armoured Orcs +50, Wrathmongers -4 melee defence
@@ -36,7 +50,7 @@ Changed since 0.1:
 Not in the pack, on purpose: auto-resolve. A draft of this build carried auto-resolve rules; they are now a separate
 test pack (`docs/AUTORESOLVE.md`) until they have been tested against vanilla.
 
-Proposed and built by Spiesky; the community list is the Total Tavern and Vermin League communities' work. Tested in
+Proposed and built by Spiesky; the community changes are inspired by the Total Tavern and Vermin League list and general player sentiment. Tested in
 game by: nobody yet.
 
 ## 0.1 (30 September 2026)

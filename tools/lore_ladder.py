@@ -172,7 +172,9 @@ LADDER = [
     L(r"vmp_mon_vargheists|vmp_mon_devils_swartzhafen", 6.50, "monstrous", note="Vargheists: vampires gone to the beast, S5 T4 W3 A3 and flying."),
     # ---------------------------------------------------------------------------------------------------- Vampire Coast
     L(r"cst_inf_zombie_deckhands|cst_inf_zombie_gunnery|cst_inf_sartosa", keep=True, note="Zombie pirates and Sartosans: fodder with cutlasses. Vanilla."),
-    L(r"cst_inf_depth_guard|cst_inf_syreens|cst_inf_deck_gunners|cst_mon_rotting_prometheans|cst_mon_mournguls", keep=True, note="Depth Guard, syreens, gunners, prometheans, mournguls: vanilla."),
+    L(r"cst_inf_depth_guard_0|cst_inf_depth_guard_ror", 3.70, "champion", size=32, note="Depth Guard: hulking drowned bodyguards in barnacled plate, few and terrible. The Lahmian Handmaidens' shape: 32 of them, each worth two."),
+    L(r"cst_inf_depth_guard_1", 3.46, "champion", size=32, note="Depth Guard (Polearms): the same drowned guard with polearms, a step below the axes as in vanilla."),
+    L(r"cst_inf_syreens|cst_inf_deck_gunners|cst_mon_rotting_prometheans|cst_mon_mournguls", keep=True, note="Syreens, gunners, prometheans, mournguls: vanilla."),
     L(r"cst_mon_animated_hulks", None, "monstrous", note="Animated Hulks: big stitched brutes; the survey says a bargain at 500. The stats are the lore, the price moves."),
     # ---------------------------------------------------------------------------------------------------- Kislev
     L(r"ksl_inf_armoured_kossars|ksl_inf_kislevite|ksl_inf_ice_guard|ksl_inf_tzar_guard", keep=True, note="Kislev: vanilla sits on the line."),

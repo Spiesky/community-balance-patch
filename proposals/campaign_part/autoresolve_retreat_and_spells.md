@@ -6,7 +6,7 @@ Four separate questions, each voted on its own. All of them are data rows, so th
 touching saves. Every option here also changes AI-against-AI battles, which decide which factions snowball, so
 "no change" is a real option on each one.
 
-How auto-resolve works, and what the patch already changes, is in [docs/AUTORESOLVE.md](../docs/AUTORESOLVE.md).
+How auto-resolve works, and what the patch already changes, is in [docs/AUTORESOLVE.md](../../docs/AUTORESOLVE.md).
 
 ## 1. The loser is wiped out instead of retreating
 
@@ -90,7 +90,7 @@ stand in for charges, which auto-resolve does not simulate.
 
 ## Evidence that settles these
 
-The test in [docs/AUTORESOLVE.md](../docs/AUTORESOLVE.md): one save on the pre-battle screen, five auto-resolves
+The test in [docs/AUTORESOLVE.md](../../docs/AUTORESOLVE.md): one save on the pre-battle screen, five auto-resolves
 without the option, five with it, one fought battle if you can, Battle Logger on. For question 1, a battle you
 expect to lose. For question 2, an army with two or more casters. For question 4, a cavalry-heavy army against
 infantry.
