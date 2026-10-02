@@ -1,6 +1,6 @@
 # Community Balance Patch: what changed
 
-370 units across every faction. This is vanilla, adjusted: apart from the lore elites below no unit changes size, no unit's strength or price moves more than about 20%, a stronger unit never gets cheaper and a weaker one never dearer, and regiments of renown move with their base unit. Every change keeps the unit's shape: charge, armour, speed, abilities, weapon type and splash never move; attack, defence, HP and damage move together. Percentages are against vanilla. See `docs/METHOD.md` for how units are measured.
+373 units across every faction. This is vanilla, adjusted: apart from the lore elites below no unit changes size, no unit's strength or price moves more than about 20%, a stronger unit never gets cheaper and a weaker one never dearer, and regiments of renown move with their base unit. Every change keeps the unit's shape: charge, armour, speed, abilities, weapon type and splash never move; attack, defence, HP and damage move together. Percentages are against vanilla. See `docs/METHOD.md` for how units are measured.
 
 **The headlines.** Elite infantry and elite cavalry are worth their price: Chaos Warriors, Chosen, Greatswords, Grave Guard, Temple Guard, Phoenix Guard, Grail Knights and Blood Knights all get a real step up over the line troops below them. Blood Knights, Grail Knights, Grail Guardians and the Swords of Chaos are fewer and far stronger, never with less total health than vanilla. Gunpowder hits hard and reloads slow: handguns, rifles, jezzails, blunderbusses and pistols fire a much heavier volley and take half again as long to reload. Chaff stays chaff and stays cheap. Monsters, war beasts, chariots and war machines are unchanged for now; they are open questions for the community, as are unit sizes.
 
@@ -326,8 +326,11 @@
 - **Changebringers**: price 1500 → 1250. *Changebringers: over-priced Flamers with a name; the stats are the lore, the price moves.*
 - **Flamers of Tzeentch**: price 800 → 950. *Flamers: the survey says a bargain at 800; the stats are the lore, the price moves.*
 
-## Vampire Coast (10)
+## Vampire Coast (13)
 
+- **Depth Guard**: 60 → 32 models; attack +6, defence +6; HP +88%; damage +88%; charge bonus 33 → 62; price 1100 → 1500. *Depth Guard: hulking drowned bodyguards in barnacled plate, few and terrible. The Lahmian Handmaidens' shape: 32 of them, each worth two.*
+- **Depth Guard (Polearms)**: 60 → 32 models; attack +6, defence +6; HP +88%; damage +88%; charge bonus 22 → 41; price 1200 → 1650. *Depth Guard (Polearms): the same drowned guard with polearms, a step below the axes as in vanilla.*
+- **The Bloody Reaver Deck Guard (Depth Guard)**: 60 → 32 models; attack +6, defence +6; HP +88%; damage +88%; charge bonus 22 → 41; price 1500 → 2050. *Depth Guard: hulking drowned bodyguards in barnacled plate, few and terrible. The Lahmian Handmaidens' shape: 32 of them, each worth two.*
 - **Deck Gunners**: each volley +60% harder, reload +50% slower (11.0s → 16.5s), ammunition 22 → 14. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 - **Sartosa Militia**: each volley +60% harder, reload +50% slower (9.0s → 13.5s), ammunition 18 → 11. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 - **Shadewraith Gunners (Deck Gunners)**: each volley +60% harder, reload +50% slower (11.0s → 16.5s), ammunition 22 → 14. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*

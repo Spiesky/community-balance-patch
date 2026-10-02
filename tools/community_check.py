@@ -97,6 +97,10 @@ def entity_problems(path):
     for line, what, ents, sets in C.ARTILLERY + C.ENTITIES:
         for e in ents:
             want.setdefault(e, {}).update(sets)
+    from decided import ELITE_BODIES                      # the patch's own lore-elite bodies, not the list's
+    for e, sets in ELITE_BODIES.items():
+        if e in rows:
+            want.setdefault(e, {}).update(sets)
     line, what, rx, accel = C.MOUNT_ACCEL
     for m in MO:
         if rx.search(m) and MO[m]["entity"] in BE:

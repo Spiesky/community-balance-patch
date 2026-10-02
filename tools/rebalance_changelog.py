@@ -147,9 +147,9 @@ def beta(R, w):
       "Greatswords, get more health and damage (up to about 17%%) and a point or two of attack and defence, at the "
       "vanilla price. Units the community list already covers take the list's numbers instead.\n\n" % n_theme)
     n_follow = sum(1 for k, es in listed.items() if any(ch.get("follows") for _, ch in es))
-    w("**The multiplayer community's balance list** (%d units, and %d list entries for artillery, chariots and mounts). "
-      "The peer-reviewed recommendations of the Total Tavern and Vermin League communities for patch 7.1+, as they wrote "
-      "them, minus what CA already did in 8.1 and minus %d entries held because campaign players already find those units "
+    w("**Community balance opinions** (%d units, and %d entries for artillery, chariots and mounts). "
+      "Inspired by the Total Tavern and Vermin League balance list for patch 7.1+ and by general player sentiment, "
+      "minus what CA already did in 8.1 and minus %d entries held because campaign players already find those units "
       "too strong (`docs/COMMUNITY_LIST.md`). Where the list changes a unit and does not mention its regiment of renown, "
       "the regiment takes the same changes (%d of the units), so it is not left behind its base. On a gun the list's "
       "missile numbers go through the gunpowder rule.\n\n" % (len(listed), len(engines), len(C.HELD), n_follow))

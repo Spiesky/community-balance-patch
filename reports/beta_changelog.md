@@ -1,14 +1,14 @@
-# Community Balance Patch beta 0.2.0: what is in the pack
+# Community Balance Patch beta 0.2.1: what is in the pack
 
-255 units change. Four things are in the pack; everything else in `reports/changelog.md` is still a proposal, waiting for players to test it and argue about it. This page is generated from the pack's own data by `tools/patch_day.sh`.
+258 units change. Four things are in the pack; everything else in `reports/changelog.md` is still a proposal, waiting for players to test it and argue about it. This page is generated from the pack's own data by `tools/patch_day.sh`.
 
-**Lore elites are fewer and far stronger** (5 units). Blood Knights, Grail Knights, Grail Guardians and the Swords of Chaos. A unit made smaller never has less total health than vanilla, its charge grows with its blows, and its price never rises faster than the strength it can actually use: a blow that does more damage than its target has hit points is not counted twice. Fewer riders means fewer swings: they kill chaff more slowly than vanilla and elite and large targets much faster.
+**Lore elites are fewer and far stronger** (8 units). Blood Knights, Grail Knights, Grail Guardians and the Swords of Chaos. A unit made smaller never has less total health than vanilla, its charge grows with its blows, and its price never rises faster than the strength it can actually use: a blow that does more damage than its target has hit points is not counted twice. Fewer riders means fewer swings: they kill chaff more slowly than vanilla and elite and large targets much faster.
 
 **Gunpowder hits hard and reloads slow** (40 units). Handguns, rifles, jezzails, blunderbusses and pistols fire a 60% heavier volley, take 50% longer to reload and carry less ammunition, so the damage over a whole battle is about vanilla's and the price does not move. How they are played changes: get them into position, fire, then pull back or let them reload in safety.
 
 **Elite infantry is worth its price** (23 units). Melee infantry the lore ladder rates elite or champion, and Greatswords, get more health and damage (up to about 17%) and a point or two of attack and defence, at the vanilla price. Units the community list already covers take the list's numbers instead.
 
-**The multiplayer community's balance list** (195 units, and 17 list entries for artillery, chariots and mounts). The peer-reviewed recommendations of the Total Tavern and Vermin League communities for patch 7.1+, as they wrote them, minus what CA already did in 8.1 and minus 5 entries held because campaign players already find those units too strong (`docs/COMMUNITY_LIST.md`). Where the list changes a unit and does not mention its regiment of renown, the regiment takes the same changes (35 of the units), so it is not left behind its base. On a gun the list's missile numbers go through the gunpowder rule.
+**Community balance opinions** (195 units, and 17 entries for artillery, chariots and mounts). Inspired by the Total Tavern and Vermin League balance list for patch 7.1+ and by general player sentiment, minus what CA already did in 8.1 and minus 5 entries held because campaign players already find those units too strong (`docs/COMMUNITY_LIST.md`). Where the list changes a unit and does not mention its regiment of renown, the regiment takes the same changes (35 of the units), so it is not left behind its base. On a gun the list's missile numbers go through the gunpowder rule.
 
 Not in the pack: auto-resolve changes (a test pack of its own, `docs/AUTORESOLVE.md`), the patch's own proposals for monsters, war beasts, chariots and war machines, unit sizes other than the lore elites and the list's Blades of Hoeth, lords and heroes, spells and abilities.
 
@@ -246,17 +246,20 @@ Not in the pack: auto-resolve changes (a test pack of its own, `docs/AUTORESOLVE
 - **Chaos Knights of Tzeentch**: +2 melee attack. *Community list.*
 - **Tzaangors**: +2 melee defence. *Community list.*
 
-## Vampire Coast (13)
+## Vampire Coast (16)
 
 - **Deck Droppers**: each volley +60% harder, reload +50% slower (9.0s → 13.5s), ammunition 20 → 13. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 - **Deck Droppers (Handgunners)**: each volley +60% harder, reload +50% slower (13.0s → 19.5s), ammunition 18 → 11. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 - **Deck Gunners**: each volley +60% harder, reload 11.0s → 15.0s (the list's -1s, then +50%), ammunition 22 → 14. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **Depth Guard**: 60 → 32 models; attack +6, defence +6; HP +88%; damage +88%; charge bonus 33 → 62; price 1100 → 1500. *Depth Guard: hulking drowned bodyguards in barnacled plate, few and terrible. The Lahmian Handmaidens' shape: 32 of them, each worth two.*
+- **Depth Guard (Polearms)**: 60 → 32 models; attack +6, defence +6; HP +88%; damage +88%; charge bonus 22 → 41; price 1200 → 1650. *Depth Guard (Polearms): the same drowned guard with polearms, a step below the axes as in vanilla.*
 - **Fell Bats**: +1 melee attack, +2 charge bonus, +3 HP per model. *Community list.*
 - **Rotting Prometheans**: -100 gold. *Community list.*
 - **Sartosa Militia**: each volley +60% harder, reload +50% slower (9.0s → 13.5s), ammunition 18 → 11. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 - **Shadewraith Gunners (Deck Gunners)**: each volley +60% harder, reload 11.0s → 15.0s (the list's -1s, then +50%), ammunition 22 → 14. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 - **Syreens**: +2 melee attack, +2 melee defence. *Community list.*
 - **The Black Spot (Zombie Pirate Gunnery Mob – Handgunners)**: each volley +60% harder, reload +50% slower (13.0s → 19.5s), ammunition 22 → 14. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
+- **The Bloody Reaver Deck Guard (Depth Guard)**: 60 → 32 models; attack +6, defence +6; HP +88%; damage +88%; charge bonus 22 → 41; price 1500 → 2050. *Depth Guard: hulking drowned bodyguards in barnacled plate, few and terrible. The Lahmian Handmaidens' shape: 32 of them, each worth two.*
 - **The Tide of Skjold (Zombie Pirate Deckhand Mob)**: -50 gold. *Community list.*
 - **Zombie Pirate Gunnery Mob**: each volley +60% harder, reload +50% slower (11.0s → 16.5s), ammunition 22 → 14. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.*
 - **Zombie Pirate Gunnery Mob (Hand Cannons)**: each volley +60% harder, reload +50% slower (14.0s → 21.0s), ammunition 22 → 14. *Gunpowder hits hard and reloads slow: fire from position, then pull back or reload in safety.* Community list: -25 gold.

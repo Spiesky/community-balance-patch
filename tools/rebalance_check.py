@@ -156,7 +156,7 @@ def main():
             want_cb = int(round(float(v["charge_bonus"]) * a["cb"] / b["cb"])) if moves else int(float(v["charge_bonus"]))
             if int(float(lu["charge_bonus"])) != want_cb:
                 fail("%s: charge bonus %s, expected %s" % (key, lu["charge_bonus"], want_cb))
-            if o.get("elite") and (o.get("k") or 1.0) > 1.0 and abs(float(lu["charge_bonus"]) / float(v["charge_bonus"]) - o["k"]) > 0.02:
+            if o.get("elite") and (o.get("k") or 1.0) > 1.0 and abs(float(lu["charge_bonus"]) - float(v["charge_bonus"]) * o["k"]) > 1.0:   # one point of rounding
                 fail("%s: charge bonus x%.3f, the damage factor is x%.3f" % (key, float(lu["charge_bonus"]) / float(v["charge_bonus"]), o["k"]))
         else:
             s = DECIDED.STATS[key]

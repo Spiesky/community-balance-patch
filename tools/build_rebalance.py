@@ -40,7 +40,7 @@ import vanilla as V
 import gamever
 import gunpowder as GP
 import packwrite
-from decided import STATS, coerce
+from decided import STATS, ELITE_BODIES, coerce
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.environ.get("CBP_OUT", os.path.join(os.path.dirname(HERE), "build", "draft", "community_balance_patch_DRAFT.pack"))
@@ -222,6 +222,15 @@ def main():
         print("   community list: %d changes, %d land units, %d entities" % (len(clog), len(land), len(entities)))
         os.makedirs(os.path.dirname(OUT), exist_ok=True)
         json.dump([[l, k, c] for l, k, c in clog], open(os.path.join(os.path.dirname(OUT), "community_log.json"), "w"), indent=0)
+    # lore elites' bodies (decided.ELITE_BODIES): heavier, so a few tough models are not thrown about all battle
+    elite_lands = {MU[o["key"]]["land_unit"] for o in props if o.get("elite")}
+    ents = {r["key"]: r for r in (entities if COMMUNITY else [])}
+    for ek, sets in ELITE_BODIES.items():
+        if any(LU[l]["man_entity"] == ek for l in elite_lands):
+            r = ents.get(ek) or coerce("battle_entities", BE[ek])
+            r.update(sets)
+            ents[ek] = r
+    entities = list(ents.values())
     # Campaign copies. Some main units share another's land unit under a campaign-only key (an Imperial Supply
     # Handgunner, Dechala's Daemonettes): they get the stats through the shared row, so when the price of the unit they
     # copy moves, theirs moves by the same ratio (a campaign cost or upkeep of 0 stays 0).
@@ -256,7 +265,7 @@ def main():
         entries.append(("db/unit_missile_weapon_junctions_tables/!community_balance_patch", packwrite.build_db("unit_missile_weapon_junctions_tables", gamever.ver("unit_missile_weapon_junctions"), junctions)))
     if yielded:
         entries.append(("db/land_units_tables/zzzz_community_balance_patch_after_bugfix", packwrite.build_db("land_units_tables", gamever.ver("land_units"), yielded)))
-    if COMMUNITY and entities:
+    if entities:
         entries.append(("db/battle_entities_tables/!community_balance_patch", packwrite.build_db("battle_entities_tables", gamever.ver("battle_entities"), entities)))
     if not only:                               # the build's version, for the Battle Logger (a data row, not a script)
         entries.append(("text/db/community_balance_patch.loc", packwrite.build_loc([(VERSION_KEY, VERSION)])))

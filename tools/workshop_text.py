@@ -87,7 +87,7 @@ def main():
         open(os.path.join(WS, out), "w", encoding="utf-8").write(text)
         print("wrote workshop/%s  %d characters" % (out, len(text)))
     _, body, undated = entry(re.escape(version))
-    notes = [("change_note.txt", "Beta %s. %s" % (version, body), undated)]
+    notes = [("change_note.txt", "Alpha %s. %s" % (version, body), undated)]
     number, body, undated_logger = entry("Battle Logger", bullet=True)
     notes.append(("logger_change_note.txt", "Battle Logger %s: %s" % (number, body), undated_logger))
     for name, text, und in notes:
